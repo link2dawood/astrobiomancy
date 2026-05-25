@@ -9,9 +9,7 @@ use App\Http\Middleware\SetLocale;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin/login', function () {
-    return view('backend.login.login');
-});
+Route::get('/admin/login', ['uses' => 'LocaleController@adminLogin']);
 
 Route::get('/logout/', [
     'uses' => 'backend\LoginController@logout',
@@ -33,22 +31,14 @@ Route::get('/cronjob', ['uses' => 'website\WebsiteController@deleteUnverifiedUse
 | Language switcher (sets cookie, redirects back)
 |--------------------------------------------------------------------------
 */
-Route::get('/lang/{locale}', function ($locale) {
-    if (!in_array($locale, SetLocale::SUPPORTED, true)) {
-        abort(404);
-    }
-    $referer = request()->headers->get('referer') ?: url('/' . $locale);
-    return redirect($referer)->cookie(SetLocale::COOKIE, $locale, 60 * 24 * 365);
-})->name('lang.switch');
+Route::get('/lang/{switch_to}', ['uses' => 'LocaleController@switch', 'as' => 'lang.switch']);
 
 /*
 |--------------------------------------------------------------------------
 | Root: redirect to the resolved locale prefix
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return redirect('/' . app()->getLocale());
-});
+Route::get('/', ['uses' => 'LocaleController@root']);
 
 /*
 |--------------------------------------------------------------------------
