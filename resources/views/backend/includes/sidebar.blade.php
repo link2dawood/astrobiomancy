@@ -58,9 +58,14 @@
                 <li> <a href="{{url('dashboard/services/geomantic-astrogeomantic-readings')}}" ><span>Geomantic / Astrogeomantic readings</span></a></li>
 
                 <li> <a href="{{url('dashboard/pages/terms-conditions')}}" ><span>Terms & Conditions</span></a></li>
-                
+                <li> <a href="{{url('dashboard/pages/cookie-policy')}}" ><span>Cookie Policy</span></a></li>
+
             </ul>
         </li>
+        <li icon="md md-blur-on"> <a href="{{url('dashboard/testimonials')}}"><i class="md md-format-quote"></i>&nbsp;<span>Testimonials</span></a></li>
+
+        <li icon="md md-blur-on"> <a href="{{url('dashboard/menus')}}"><i class="md md-list"></i>&nbsp;<span>Menus</span></a></li>
+
         <li icon="md md-blur-on"> <a href="{{url('dashboard/settings')}}"><i class="md md-settings"></i>&nbsp;<span>Settings</span></a></li>
 
         <li icon="md md-blur-on"> <a href="{{url('dashboard/media')}}"><i class="md md-settings"></i>&nbsp;<span>Media</span></a></li>

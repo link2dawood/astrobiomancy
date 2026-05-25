@@ -122,4 +122,68 @@
 </div>
 </section>
 <hr class="m-0" />
+
+@if (!empty($testimonials) && $testimonials->isNotEmpty())
+<section class="py-10" style="background:#feefd2;">
+    <div class="container px-5">
+        <div class="text-center mb-5">
+            <h2 style="color:#5e000b;">{{ __('site.testimonials_title') }}</h2>
+            <p class="text-muted">{{ __('site.testimonials_subtitle') }}</p>
+        </div>
+
+        <div id="testimonialsSlider" class="carousel slide" data-bs-ride="carousel" data-ride="carousel" data-bs-interval="6000">
+            <div class="carousel-inner">
+                @foreach ($testimonials->chunk(2) as $idx => $chunk)
+                    <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                        <div class="row gx-4 justify-content-center">
+                            @foreach ($chunk as $t)
+                                <div class="col-md-5">
+                                    <div class="card border-0 shadow-sm h-100" style="border-radius:10px; background:#fff;">
+                                        <div class="card-body p-4">
+                                            <div style="color:#ff9536; font-size:1.6rem; line-height:1;">&ldquo;</div>
+                                            <p class="text-dark" style="font-style:italic; line-height:1.6;">
+                                                {{ \Illuminate\Support\Str::limit(strip_tags($t->content), 260) }}
+                                            </p>
+                                            <div class="d-flex align-items-center mt-3">
+                                                @if ($t->photo)
+                                                    <img src="{{ url('public/uploads/testimonials/' . $t->photo) }}" alt=""
+                                                         style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:12px;">
+                                                @else
+                                                    <div style="width:48px;height:48px;border-radius:50%;background:#ff9536;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;margin-right:12px;">
+                                                        {{ strtoupper(mb_substr($t->name, 0, 1)) }}
+                                                    </div>
+                                                @endif
+                                                <div>
+                                                    <div style="font-weight:600; color:#5e000b;">{{ $t->name }}</div>
+                                                    @if ($t->display_date)
+                                                        <div class="small text-muted">{{ $t->display_date->translatedFormat('F Y') }}</div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            @if ($testimonials->count() > 2)
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsSlider" data-target="#testimonialsSlider" data-bs-slide="prev" data-slide="prev" style="width: 5%;">
+                    <span class="carousel-control-prev-icon" style="filter: invert(1);" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialsSlider" data-target="#testimonialsSlider" data-bs-slide="next" data-slide="next" style="width: 5%;">
+                    <span class="carousel-control-next-icon" style="filter: invert(1);" aria-hidden="true"></span>
+                </button>
+            @endif
+        </div>
+
+        <div class="text-center mt-5">
+            <a class="btn btn-teal" href="{{ url(app()->getLocale() . '/testimonials') }}">{{ __('site.testimonials_view_all') }}</a>
+        </div>
+    </div>
+</section>
+@endif
+
 @endsection

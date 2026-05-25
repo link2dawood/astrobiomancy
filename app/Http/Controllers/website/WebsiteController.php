@@ -18,6 +18,7 @@ use App\Models\Orders;
 use App\Models\Privacypolicy;
 use App\Models\Homepage;
 use App\Models\Pages;
+use App\Models\Testimonial;
 use Stripe;
 use Carbon\Carbon;
 
@@ -28,10 +29,21 @@ use Carbon\Carbon;
 */
 class WebsiteController extends Controller
 {  
-	public function index () 
+	public function index ()
 	{
 		$homepage = Homepage::find(1);
-		return view('website.home.index', compact('homepage'));
+		$testimonials = Testimonial::published()->forLocale()
+			->orderBy('sort')->orderBy('id', 'desc')
+			->limit(12)->get();
+		return view('website.home.index', compact('homepage', 'testimonials'));
+	}
+
+	public function testimonials ()
+	{
+		$testimonials = Testimonial::published()->forLocale()
+			->orderBy('sort')->orderBy('id', 'desc')
+			->paginate(24);
+		return view('website.testimonials', compact('testimonials'));
 	}
 
 	public function contactus () 
@@ -57,7 +69,7 @@ class WebsiteController extends Controller
 		$user->account_token = '';
 		$user->is_verify = 1;
 		$user->save();
-		return redirect('user/login')->with('success', 'Your email address has been verified. You can now log in to continue.');;
+		return redirect(app()->getLocale() . '/user/login')->with('success', __('site.flash_verified'));
 	}
 
 	public function userlogin ( Request $request ) 
@@ -77,21 +89,21 @@ class WebsiteController extends Controller
 					$user=auth()->user();
 
 					if ($user->is_verify==1) {
-						return redirect()->intended('users/account');
+						return redirect()->intended(app()->getLocale() . '/users/account');
 					} else {
 						Auth::logout();
-						return redirect()->back()->with('error', 'Verification link has been sent on your email. Please first verify your account.');
+						return redirect()->back()->with('error', __('site.flash_verify_required'));
 
 					}
 				}else{
-					return redirect()->back()->with('error', 'Invalid Email or Password.');
+					return redirect()->back()->with('error', __('site.flash_invalid_login'));
 				}
 			}else{
-				return redirect()->back()->with('error', 'Captcha not Validated');
+				return redirect()->back()->with('error', __('site.flash_captcha_required'));
 			}
-			
+
 		}else{
-			return redirect()->back()->with('error', 'Invalid Captcha');
+			return redirect()->back()->with('error', __('site.flash_captcha_invalid'));
 		}
 		
 	}
@@ -107,7 +119,7 @@ class WebsiteController extends Controller
 
 
 				if (isset($user->id)) {
-					return back()->with('error', 'User already exist with this email.');
+					return back()->with('error', __('site.flash_user_exists'));
 				}
 				$random_number = rand(10000, 1000000000000000);
 				$random_number = md5($random_number);
@@ -121,9 +133,9 @@ class WebsiteController extends Controller
 				$user->save();
 				$user->assignRole(2);
 
-				$subject = "ASTROBIOMANCY : YOUR ACCOUNT HAS BEEN CREATED.";
+				$subject = __('site.mail_subject_register');
 
-				$email_data = ['verfiylink'=>url('account-verfiy/'.$random_number), 'name'=>$request->name];
+				$email_data = ['verfiylink'=>url(app()->getLocale() . '/account-verfiy/'.$random_number), 'name'=>$request->name];
 				$to_email= $request->email;
 				\Mail::send('mail.register', $email_data, function($message) use( $to_email, $subject) {
 					$message->to($to_email)->subject
@@ -131,12 +143,12 @@ class WebsiteController extends Controller
 					$message->from(env('MAIL_FROM_ADDRESS'));
 				});
 
-				return redirect('user/login')->with('success', 'Your account has been created. An email with a verification link has been sent to your address. Please click that link to verify your account. If the account is not verified within one hour, it is automatically deleted. If you have not received the verification email, please check your spam folder or use an alternative email address.');
+				return redirect(app()->getLocale() . '/user/login')->with('success', __('site.flash_account_created'));
 			}else{
-				return redirect()->back()->with('error', 'Captcha not Validated');
+				return redirect()->back()->with('error', __('site.flash_captcha_required'));
 			}
 		}else{
-			return redirect()->back()->with('error', 'Invalid Captcha');
+			return redirect()->back()->with('error', __('site.flash_captcha_invalid'));
 		}
 		
 
@@ -200,7 +212,10 @@ class WebsiteController extends Controller
 		if (isset($settings->enable_blog) && $settings->enable_blog==='0') {
 			abort(404);
 		}
-		$posts = Blog::orderBy('id', 'DESC')->paginate(10);
+		$posts = Blog::where('status', 'Published')
+			->forLocale()
+			->orderBy('id', 'DESC')
+			->paginate(10);
 		return view('website.blog.list', compact('posts'));
 	}
 
@@ -216,18 +231,20 @@ class WebsiteController extends Controller
 				$comments->post_id = $request->post_id;
 				$comments->comment = $request->comments;
 				$comments->save();
-				return back()->with('success', 'Comment has been added.');
+				return back()->with('success', __('site.flash_comment_added'));
 			}else{
-				return redirect()->back()->with('error', 'Captcha not Validated');
+				return redirect()->back()->with('error', __('site.flash_captcha_required'));
 			}
 
 		}else{
-			return redirect()->back()->with('error', 'Invalid Captcha');
+			return redirect()->back()->with('error', __('site.flash_captcha_invalid'));
 		}
 	}
 	public function singlePost ( $slug ) 
 	{
-		$post = Blog::where('slug', $slug)->first();
+		$post = Blog::where('slug', $slug)
+			->where('status', 'Published')
+			->first();
 		if (!isset($post->id)) {
 			abort(404);
 		}

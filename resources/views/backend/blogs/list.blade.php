@@ -173,6 +173,7 @@ $user_data=Auth::User();
                       <thead>
                         <tr>
                         	<th >Title</th>
+                        	<th >Lang</th>
                         	<th >Author</th>
                         	<th >Category</th>
                         	<th >Status</th>
@@ -183,6 +184,7 @@ $user_data=Auth::User();
 											  @foreach ($blogs as $blog)
 											  <tr>
 												  <td >{{$blog->title}}</td>
+												  <td ><span class="badge badge-info">{{ strtoupper($blog->lang ?? 'en') }}</span></td>
 												  <td >{{@$blog->author_data->name}}</td>
 												  <td >{{@$blog->cat_data->name}}</td>
 												  <td >{{$blog->status}}</td>

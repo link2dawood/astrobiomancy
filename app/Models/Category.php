@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 */ 
 class Category extends Model
 {
+    use \App\Models\Concerns\Translatable;
     /**
      * The database table used by the model.
      *

@@ -52,12 +52,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{$post->title}}</h5>
                         <p class="card-text">
-                            <?php
-                            $string = $post->description;
-                            // Use substr to cut the string after 30 characters
-                            $cutString = substr($string, 0, 100);
-                            echo $cutString;
-                            ?>
+                            {{ \Illuminate\Support\Str::limit(trim(strip_tags($post->description)), 150) }}
                         </p>
                     </div>
                     <div class="card-footer">

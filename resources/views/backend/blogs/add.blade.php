@@ -138,6 +138,33 @@
 							</div>
 							</div>
 
+							<div class="col-md-3" style="margin-top:15px">
+								<label class="control-label">Language</label>
+								<select class="form-control" name="lang">
+									@foreach($locales as $loc)
+										<option value="{{ $loc }}">{{ strtoupper($loc) }}</option>
+									@endforeach
+								</select>
+							</div>
+							<div class="col-md-5" style="margin-top:15px">
+								<label class="control-label">Translation of</label>
+								<select class="form-control select2" name="translation_of">
+									<option value="">— None (this is an original post) —</option>
+									@foreach($translation_parents as $p)
+										<option value="{{ $p->id }}">[{{ strtoupper($p->lang) }}] {{ $p->title }}</option>
+									@endforeach
+								</select>
+							</div>
+							<div class="col-md-4" style="margin-top:15px"></div>
+							<div class="col-md-6" style="margin-top:15px">
+								<label class="control-label">Meta Title</label>
+								<input type="text" name="meta_title" class="form-control" maxlength="70" placeholder="Page title shown in search results">
+							</div>
+							<div class="col-md-6" style="margin-top:15px">
+								<label class="control-label">Meta Description</label>
+								<input type="text" name="meta_description" class="form-control" maxlength="160" placeholder="Search snippet, ~155 chars">
+							</div>
+
 						</div>
 						</div>
 					

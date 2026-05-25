@@ -13,138 +13,228 @@ use App\Models\Disclaimer;
 use App\Models\Privacypolicy;
 use App\Models\Homepage;
 use App\Models\Pages;
+use App\Http\Middleware\SetLocale;
 
 /**
- * The class PagesController extends Controller class is responsible for managing the blog view 
+ * Backend page management. Singleton pages (about, disclaimer, privacy, home)
+ * carry one row per locale, keyed by `lang`. Save handlers upsert only the
+ * languages present in the request, so a save targeting EN cannot wipe DE.
+ *
  * Author : Syed Ali Raza
-*/
+ */
 class PagesController extends Controller
-{  
-	public function page ( $slug ) 
-	{
-		$page =  Pages::where('slug', $slug)->first();
-		return view('backend.pages.page', compact('page'));
-	}
+{
+    /**
+     * @return array<string> Supported locale codes.
+     */
+    private function locales()
+    {
+        return SetLocale::SUPPORTED;
+    }
 
-	
+    /**
+     * Load a singleton model's row for each locale, creating blank rows on the fly
+     * so the view always has something to bind to.
+     *
+     * @param string $modelClass FQCN of an Eloquent model
+     * @return array<string, \Illuminate\Database\Eloquent\Model> keyed by locale
+     */
+    private function loadByLocale($modelClass)
+    {
+        $rows = [];
+        foreach ($this->locales() as $loc) {
+            $rows[$loc] = $modelClass::firstOrNew(['lang' => $loc]);
+        }
+        return $rows;
+    }
 
-	public function update ( Request $request ) 
-	{
-		$pages =  Pages::findOrFail($request->id);
-		$pages->main_heading = $request->main_heading;
-		$pages->second_heading = $request->second_heading;
-		$pages->description = $request->description;
-		$pages->save();
-		return back()->with('message', 'add');
-	}
+    /**
+     * Upsert the language-keyed payload onto a singleton model. Each lang is
+     * persisted independently; missing langs in the request are left untouched.
+     *
+     * @param string $modelClass FQCN
+     * @param Request $request
+     * @param array<string> $fields Fields expected as field[lang] on the request
+     */
+    private function saveByLocale($modelClass, Request $request, array $fields)
+    {
+        // Legacy fallback: when fields arrive as scalars (old single-language form),
+        // treat them as EN input so unmigrated views keep working.
+        $legacy = false;
+        foreach ($fields as $f) {
+            if ($request->has($f) && !is_array($request->input($f))) {
+                $legacy = true;
+                break;
+            }
+        }
 
-	public function about () 
-	{
-		$aboutus =  Aboutus::find(1);
+        if ($legacy) {
+            $row = $modelClass::firstOrNew(['lang' => 'en']);
+            foreach ($fields as $f) {
+                if ($request->has($f)) {
+                    $row->{$f} = $request->input($f);
+                }
+            }
+            $row->lang = 'en';
+            $row->save();
+            return;
+        }
 
-		return view('backend.pages.aboutus', compact('aboutus'));
-	}
-	public function about_save ( Request $request ) 
-	{
-		$aboutus =  Aboutus::find(1);
-		$aboutus->main_heading = $request->main_heading;
-		$aboutus->second_heading = $request->second_heading;
-		$aboutus->description = $request->description;
-		$aboutus->save();
-		return back()->with('message', 'add');
-	}
+        foreach ($this->locales() as $loc) {
+            $touched = false;
+            foreach ($fields as $f) {
+                if ($request->has($f . '.' . $loc)) {
+                    $touched = true;
+                    break;
+                }
+            }
+            if (!$touched) {
+                continue;
+            }
+            $row = $modelClass::firstOrNew(['lang' => $loc]);
+            foreach ($fields as $f) {
+                $row->{$f} = $request->input($f . '.' . $loc);
+            }
+            $row->lang = $loc;
+            $row->save();
+        }
+    }
 
-	public function disclaimer () 
-	{
-		$disclaimer =  Disclaimer::find(1);
+    public function page($slug)
+    {
+        $pages = [];
+        foreach ($this->locales() as $loc) {
+            $pages[$loc] = Pages::where('slug', $slug)->where('lang', $loc)->first()
+                        ?: Pages::where('slug', $slug)->first(); // graceful fallback for legacy rows
+        }
+        return view('backend.pages.page', compact('pages', 'slug'));
+    }
 
-		return view('backend.pages.disclaimer', compact('disclaimer'));
-	}
+    /**
+     * Generic page row update by id (each row is per-language).
+     */
+    public function update(Request $request)
+    {
+        $pages = Pages::findOrFail($request->id);
+        $pages->main_heading    = $request->main_heading;
+        $pages->second_heading  = $request->second_heading;
+        $pages->description     = $request->description;
+        $pages->meta_title       = $request->meta_title;
+        $pages->meta_description = $request->meta_description;
+        $pages->save();
+        return back()->with('message', 'add');
+    }
 
-	public function disclaimer_save ( Request $request ) 
-	{
-		$disclaimer =  Disclaimer::find(1);
-		$disclaimer->main_heading = $request->main_heading;
-		$disclaimer->second_heading = $request->second_heading;
-		$disclaimer->description = $request->description;
-		$disclaimer->save();
-		return back()->with('message', 'add');
-	}
+    public function about()
+    {
+        $rows = $this->loadByLocale(Aboutus::class);
+        return view('backend.pages.aboutus', ['rows' => $rows]);
+    }
 
-	public function home () 
-	{
-		$homepage =  Homepage::find(1);
-		return view('backend.pages.homepage', compact('homepage'));
-	}
+    public function about_save(Request $request)
+    {
+        $this->saveByLocale(Aboutus::class, $request, [
+            'main_heading', 'second_heading', 'description',
+            'meta_title', 'meta_description',
+        ]);
+        return back()->with('message', 'add');
+    }
 
-	public function home_save (Request $request ) 
-	{
-		$image = $request->file('image');
-		$imageName = "";
-		if (isset($image)) {
-        	$imageName = time() . '.' . $image->extension();
-	        $path = public_path('uploads/images/');
-	        $image->move($path, $imageName);
-		}
-		$homepage =  Homepage::find(1);
-		$homepage->top_header_heading  = $request->top_header_heading;
-		$homepage->get_started_label  = $request->get_started_label;
-		$homepage->top_header_subheading  = $request->top_header_subheading;
-		if ($imageName!='') {
-			$homepage->banner_image  = $imageName;
-		}
-		$homepage->get_started_link  = $request->get_started_link;
-		$homepage->welcome_lable  = $request->welcome_lable;
-		$homepage->weclome_text  = $request->weclome_text;
-		$qa_json = [];
-		if (isset($request->question)) {
-			foreach ($request->question as $key=>$value) {
-				$qa_json[] = [
-					'question' =>$value,
-					'answer' =>$request->answer[$key],
-				];
-			}
-		}
-		$homepage->qa_json  = json_encode($qa_json);
-		
-		$offer_data_links = [];
-		if (isset($request->offer_name[0])) {
-			
-			foreach($request->offer_name as $key=>$offer) {
-				$offer_data_links[] = [
-					'name'=>$offer,
-					'offer_link'=>$request->offer_link[$key],
-					'offer_icon'=>$request->offer_icon[$key],
-				];
-			}
-		}
-		$offer_data = [
-			'offer_heading'=>$request->offer_heading,
-			'offer_p1'=>$request->offer_p1,
-			'offer_p2'=>$request->offer_p2,
-			'offer_data_links'=>$offer_data_links,
-		];
-		$homepage->offer_json  = json_encode($offer_data);
+    public function disclaimer()
+    {
+        $rows = $this->loadByLocale(Disclaimer::class);
+        return view('backend.pages.disclaimer', ['rows' => $rows]);
+    }
 
-		$homepage->save();
-		return back()->with('message', 'add');
+    public function disclaimer_save(Request $request)
+    {
+        $this->saveByLocale(Disclaimer::class, $request, [
+            'main_heading', 'second_heading', 'description',
+            'meta_title', 'meta_description',
+        ]);
+        return back()->with('message', 'add');
+    }
 
-	}
+    public function privacypolicy()
+    {
+        $rows = $this->loadByLocale(Privacypolicy::class);
+        return view('backend.pages.privacypolicy', ['rows' => $rows]);
+    }
 
-	public function privacypolicy () 
-	{
-		$privacypolicy =  Privacypolicy::find(1);
+    public function privacypolicy_save(Request $request)
+    {
+        $this->saveByLocale(Privacypolicy::class, $request, [
+            'main_heading', 'second_heading', 'description',
+            'meta_title', 'meta_description',
+        ]);
+        return back()->with('message', 'add');
+    }
 
-		return view('backend.pages.privacypolicy', compact('privacypolicy'));
-	}
+    public function home()
+    {
+        $rows = $this->loadByLocale(Homepage::class);
+        return view('backend.pages.homepage', ['rows' => $rows]);
+    }
 
-	public function privacypolicy_save ( Request $request ) 
-	{
-		$privacypolicy =  Privacypolicy::find(1);
-		$privacypolicy->main_heading = $request->main_heading;
-		$privacypolicy->second_heading = $request->second_heading;
-		$privacypolicy->description = $request->description;
-		$privacypolicy->save();
-		return back()->with('message', 'add');
-	}
+    public function home_save(Request $request)
+    {
+        // Image is shared (one banner for both langs); upload once.
+        $imageName = '';
+        $image = $request->file('image');
+        if (isset($image)) {
+            $imageName = time() . '.' . $image->extension();
+            $image->move(public_path('uploads/images/'), $imageName);
+        }
+
+        foreach ($this->locales() as $loc) {
+            if (!$request->has('top_header_heading.' . $loc)) {
+                continue; // language not submitted — leave its row alone
+            }
+
+            $row = Homepage::firstOrNew(['lang' => $loc]);
+            $row->lang                  = $loc;
+            $row->top_header_heading    = $request->input('top_header_heading.' . $loc);
+            $row->get_started_label     = $request->input('get_started_label.' . $loc);
+            $row->top_header_subheading = $request->input('top_header_subheading.' . $loc);
+            $row->get_started_link      = $request->input('get_started_link.' . $loc);
+            $row->welcome_lable         = $request->input('welcome_lable.' . $loc);
+            $row->weclome_text          = $request->input('weclome_text.' . $loc);
+            $row->meta_title             = $request->input('meta_title.' . $loc);
+            $row->meta_description       = $request->input('meta_description.' . $loc);
+
+            if ($imageName !== '') {
+                $row->banner_image = $imageName;
+            }
+
+            $qa_json = [];
+            $questions = (array) $request->input('question.' . $loc, []);
+            $answers   = (array) $request->input('answer.' . $loc, []);
+            foreach ($questions as $i => $q) {
+                $qa_json[] = ['question' => $q, 'answer' => $answers[$i] ?? ''];
+            }
+            $row->qa_json = json_encode($qa_json);
+
+            $offer_data_links = [];
+            $names = (array) $request->input('offer_name.' . $loc, []);
+            $links = (array) $request->input('offer_link.' . $loc, []);
+            $icons = (array) $request->input('offer_icon.' . $loc, []);
+            foreach ($names as $i => $n) {
+                $offer_data_links[] = [
+                    'name'       => $n,
+                    'offer_link' => $links[$i] ?? '',
+                    'offer_icon' => $icons[$i] ?? '',
+                ];
+            }
+            $row->offer_json = json_encode([
+                'offer_heading'    => $request->input('offer_heading.' . $loc),
+                'offer_p1'         => $request->input('offer_p1.' . $loc),
+                'offer_p2'         => $request->input('offer_p2.' . $loc),
+                'offer_data_links' => $offer_data_links,
+            ]);
+
+            $row->save();
+        }
+
+        return back()->with('message', 'add');
+    }
 }

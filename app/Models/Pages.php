@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 */ 
 class Pages extends Model
 {
+    use \App\Models\Concerns\Translatable;
     /**
      * The database table used by the model.
      *

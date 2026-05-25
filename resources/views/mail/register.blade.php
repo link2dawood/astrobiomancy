@@ -1,11 +1,9 @@
-<html>
+<html lang="{{ app()->getLocale() }}">
 	<head>
 	</head>
 	<body>
-		<h2>Hi {{$name}}, your account has been created.</h2>
-
-		<p>Please click this link to verify your email:<a href="{{$verfiylink}}"> Verify</a></p>
-
+		<h2>{{ __('site.mail_hi', ['name' => $name]) }}</h2>
+		<p>{{ __('site.mail_register_body') }}</p>
+		<p><a href="{{$verfiylink}}">{{ __('site.btn_continue') }}</a></p>
 	</body>
-
 </html>

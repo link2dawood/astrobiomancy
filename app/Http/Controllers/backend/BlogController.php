@@ -11,14 +11,16 @@ use App\User;
 use App\Models\Category;
 use App\Models\Blog;
 use App\Models\Comments;
+use App\Http\Middleware\SetLocale;
 /**
- * The class BlogController extends Controller class is responsible for managing the blog view 
+ * The class BlogController extends Controller class is responsible for managing the blog view
  * Author : Syed Ali Raza
 */
 class BlogController extends Controller
-{  
-	public function list() 
+{
+	public function list()
 	{
+		// Show all posts; the lang column lets editors see which language each row is in.
 		$blogs = Blog::orderBy('id', 'DESC')->paginate(20);
 		return view('backend.blogs.list', compact('blogs'));
 	}
@@ -29,18 +31,22 @@ class BlogController extends Controller
 		return view('backend.blogs.comments', compact('comments'));
 	}
 
-	public function add() 
+	public function add()
 	{
 		$users = User::all();
 		$category = Category::all();
-		return view('backend.blogs.add', compact('users', 'category'));
+		$locales = SetLocale::SUPPORTED;
+		$translation_parents = Blog::whereNull('translation_of')->orderBy('title')->get(['id', 'title', 'lang']);
+		return view('backend.blogs.add', compact('users', 'category', 'locales', 'translation_parents'));
 	}
-	public function edit( $id ) 
+	public function edit( $id )
 	{
 		$users = User::all();
 		$category = Category::all();
 		$blog = Blog::find($id);
-		return view('backend.blogs.edit', compact('users', 'category', 'blog'));
+		$locales = SetLocale::SUPPORTED;
+		$translation_parents = Blog::whereNull('translation_of')->where('id', '!=', $id)->orderBy('title')->get(['id', 'title', 'lang']);
+		return view('backend.blogs.edit', compact('users', 'category', 'blog', 'locales', 'translation_parents'));
 	}
 	public function add_action( Request $request ) 
 	{
@@ -66,6 +72,10 @@ class BlogController extends Controller
 		$blog->author_id = $request->author_id;
 		$blog->status = $request->status;
 		$blog->meta_keyword = $request->meta_keyword;
+		$blog->meta_title = $request->meta_title;
+		$blog->meta_description = $request->meta_description;
+		$blog->lang = in_array($request->lang, SetLocale::SUPPORTED, true) ? $request->lang : SetLocale::DEFAULT;
+		$blog->translation_of = $request->translation_of ?: null;
 		$blog->slug = $slug;
 		$blog->image = $imageName;
 		$blog->save();
@@ -109,6 +119,12 @@ class BlogController extends Controller
 		$blog->author_id = $request->author_id;
 		$blog->status = $request->status;
 		$blog->meta_keyword = $request->meta_keyword;
+		$blog->meta_title = $request->meta_title;
+		$blog->meta_description = $request->meta_description;
+		if (in_array($request->lang, SetLocale::SUPPORTED, true)) {
+			$blog->lang = $request->lang;
+		}
+		$blog->translation_of = $request->translation_of ?: null;
 		$blog->slug = $slug;
 		if ($imageName!='') {
 
