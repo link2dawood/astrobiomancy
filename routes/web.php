@@ -155,3 +155,14 @@ Route::group(['middleware' => ['role:Admin', 'auth']], function () {
     Route::post('/dashboard/users/add_action', ['uses' => 'backend\UsersController@add_action']);
     Route::post('/dashboard/users/update_action', ['uses' => 'backend\UsersController@update_action']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Fallback: catch legacy unprefixed URLs and redirect to /{locale}/{path}
+|--------------------------------------------------------------------------
+| Phase 2 moved every public page under a {locale} prefix. Anything still
+| linking to /about-us, /blog, /service/xxx etc. lands here and gets a 301
+| to the locale-prefixed equivalent. Admin and internal paths are exempted.
+*/
+Route::fallback(['uses' => 'LocaleController@fallback']);
+

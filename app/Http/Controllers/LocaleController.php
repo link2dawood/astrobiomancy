@@ -37,4 +37,35 @@ class LocaleController extends Controller
     {
         return view('backend.login.login');
     }
+
+    /**
+     * Fallback for any path that didn't match a registered route.
+     *
+     * Phase 2 moved every public page under a {locale} prefix, but old links
+     * (DB content, bookmarks, legacy menus, hardcoded buttons) still point at
+     * paths like /about-us. Rather than touching every view, redirect any
+     * unmatched path to the locale-prefixed equivalent.
+     *
+     * Returns a hard 404 only when the path looks like an asset or admin URL —
+     * those shouldn't be locale-prefixed.
+     */
+    public function fallback()
+    {
+        $path = request()->path();
+        $first = strtok($path, '/');
+
+        // Don't loop on admin/internal URLs that genuinely don't exist
+        $reserved = ['dashboard', 'admin', 'login', 'logout', 'login_action',
+                     'lang', 'cronjob', 'api', 'public', 'storage', 'uploads'];
+        if (in_array($first, $reserved, true)) {
+            abort(404);
+        }
+
+        // Already prefixed — really doesn't exist
+        if (in_array($first, SetLocale::SUPPORTED, true)) {
+            abort(404);
+        }
+
+        return redirect('/' . app()->getLocale() . '/' . $path, 301);
+    }
 }
