@@ -54,7 +54,7 @@
 							<div class="col-md-4">
 							<div class="form-group">
 								<label for="inputEmail" class="control-label">Email</label>
-								{{ Form::input('email', 'email',$users->email, ['class' => ' form-control', 'id' => '','required'=>'required','readonly'=>'true' ]) }}
+								{{ Form::input('email', 'email',$users->email, ['class' => ' form-control', 'id' => '','required'=>'required']) }}
 							</div>
 							</div>
 							<div class="col-md-4">

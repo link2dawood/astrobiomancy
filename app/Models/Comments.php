@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class Comments extends Model
 {
     use \App\Models\Concerns\Translatable;
+    protected $guarded = [];
     /**
      * The database table used by the model.
      *

@@ -59,12 +59,27 @@ class UsersController extends Controller
 		}
 		
 	}
-	public function update_action( Request $request ) 
+	public function update_action( Request $request )
 	{
 		$user = User::find($request->id);
+		if (!$user) {
+			return redirect('dashboard/users')->with('error', 'User not found.');
+		}
+
 		$user->name = $request->name;
-		if ($request->password!='') {
-		$user->password =bcrypt($request->password) ;
+
+		if ($request->email && $request->email !== $user->email) {
+			$exists = User::where('email', $request->email)
+				->where('id', '!=', $user->id)
+				->exists();
+			if ($exists) {
+				return back()->with('error', 'Another user already has this email.');
+			}
+			$user->email = $request->email;
+		}
+
+		if ($request->password != '') {
+			$user->password = bcrypt($request->password);
 		}
 		$user->save();
 		return redirect('dashboard/users')->with('message', 'update');
