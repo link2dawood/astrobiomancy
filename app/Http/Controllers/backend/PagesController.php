@@ -173,7 +173,13 @@ class PagesController extends Controller
     public function home()
     {
         $rows = $this->loadByLocale(Homepage::class);
-        return view('backend.pages.homepage', ['rows' => $rows]);
+        // Legacy compat: homepage.blade.php still expects a flat $homepage.
+        // Pass the EN row so the existing single-language editor keeps working
+        // until the view is converted to per-language tabs.
+        return view('backend.pages.homepage', [
+            'rows'     => $rows,
+            'homepage' => $rows['en'] ?? new Homepage(),
+        ]);
     }
 
     public function home_save(Request $request)
