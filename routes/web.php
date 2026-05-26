@@ -42,6 +42,26 @@ Route::get('/', ['uses' => 'LocaleController@root']);
 
 /*
 |--------------------------------------------------------------------------
+| Legacy POST aliases (unprefixed)
+|--------------------------------------------------------------------------
+| Forms in the views (and any external integrations) post to unprefixed
+| URLs like /user/login. Route::fallback() only catches GET in L7, so
+| POSTs land as MethodNotAllowed. These aliases route the same controller
+| methods so existing forms work without touching every Blade view.
+*/
+Route::post('/user/login',                ['uses' => 'website\WebsiteController@userlogin']);
+Route::post('/create-account',            ['uses' => 'website\WebsiteController@createuser']);
+Route::post('/post-comment',              ['uses' => 'website\WebsiteController@postcomment']);
+Route::post('/postorder',                 ['uses' => 'website\WebsiteController@postorder']);
+
+Route::group(['middleware' => ['role:User|Admin', 'auth']], function () {
+    Route::post('/users/accountupdate',           ['uses' => 'website\AccountController@accountupdate']);
+    Route::post('/users/ordersaveques',           ['uses' => 'website\AccountController@ordersaveques']);
+    Route::post('/users/orders/uploadtempfile',   ['uses' => 'website\AccountController@uploadtempfile']);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Public website (locale-prefixed)
 |--------------------------------------------------------------------------
 */

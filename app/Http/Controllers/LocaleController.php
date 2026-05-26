@@ -11,15 +11,37 @@ use Illuminate\Http\Request;
 class LocaleController extends Controller
 {
     /**
-     * Sets the consent cookie for the requested locale and redirects back.
+     * Sets the locale cookie AND rewrites the Referer URL so the prefix
+     * matches the new locale. The URL prefix is authoritative in SetLocale,
+     * so just bouncing back to the Referer leaves the page rendering in the
+     * old language. We swap /en/... <-> /de/... (or prepend if missing).
      */
     public function switch($switch_to)
     {
         if (!in_array($switch_to, SetLocale::SUPPORTED, true)) {
             abort(404);
         }
-        $referer = request()->headers->get('referer') ?: url('/' . $switch_to);
-        return redirect($referer)->cookie(SetLocale::COOKIE, $switch_to, 60 * 24 * 365);
+
+        $referer = request()->headers->get('referer');
+        $target  = '/' . $switch_to;
+
+        if ($referer) {
+            $parts = parse_url($referer);
+            $path  = $parts['path'] ?? '/';
+
+            // Drop any existing locale prefix, then prepend the new one.
+            $supported = implode('|', SetLocale::SUPPORTED);
+            $stripped  = preg_replace('#^/(' . $supported . ')(?=/|$)#', '', $path);
+            $stripped  = $stripped === '' ? '/' : $stripped;
+
+            $target = '/' . $switch_to . ($stripped === '/' ? '' : $stripped);
+
+            if (!empty($parts['query'])) {
+                $target .= '?' . $parts['query'];
+            }
+        }
+
+        return redirect($target)->cookie(SetLocale::COOKIE, $switch_to, 60 * 24 * 365);
     }
 
     /**
