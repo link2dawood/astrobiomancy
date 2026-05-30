@@ -29,9 +29,22 @@ use Carbon\Carbon;
 */
 class WebsiteController extends Controller
 {  
+	/**
+	 * Singleton-page lookup that respects the active locale, falling back to
+	 * EN when the localized row hasn't been created yet. Keeps the public
+	 * site rendering rather than 404-ing while editors backfill DE content.
+	 */
+	private function localized($modelClass)
+	{
+		$loc = app()->getLocale();
+		return $modelClass::where('lang', $loc)->first()
+			?: $modelClass::where('lang', 'en')->first()
+			?: $modelClass::first();
+	}
+
 	public function index ()
 	{
-		$homepage = Homepage::find(1);
+		$homepage = $this->localized(Homepage::class);
 		$testimonials = Testimonial::published()->forLocale()
 			->orderBy('sort')->orderBy('id', 'desc')
 			->limit(12)->get();
@@ -154,30 +167,39 @@ class WebsiteController extends Controller
 
 	}
 
-	public function aboutus () 
+	public function aboutus ()
 	{
-		$aboutus =  Aboutus::find(1);
+		$aboutus = $this->localized(Aboutus::class);
 		return view('website.pages.aboutus', compact('aboutus'));
 	}
 
-	public function privacypolicy () 
+	public function privacypolicy ()
 	{
-		$privacypolicy =  Privacypolicy::find(1);
+		$privacypolicy = $this->localized(Privacypolicy::class);
 		return view('website.pages.privacypolicy', compact('privacypolicy'));
 	}
 
-	public function page ( $slug ) 
+	public function page ( $slug )
 	{
-		$page =  Pages::where('slug', $slug)->first();
-		if(!isset($page->id)) {
+		$loc = app()->getLocale();
+		$page = Pages::where('slug', $slug)->where('lang', $loc)->first()
+			 ?: Pages::where('slug', $slug)->where('lang', 'en')->first()
+			 ?: Pages::where('slug', $slug)->first();
+		if (!isset($page->id)) {
 			abort(404);
 		}
 		return view('website.pages.page', compact('page'));
 	}
 
-	public function service ($slug) 
+	public function service ($slug)
 	{
-		$service =  Services::where('slug', $slug)->first();
+		$loc = app()->getLocale();
+		$service = Services::where('slug', $slug)->where('lang', $loc)->first()
+				?: Services::where('slug', $slug)->where('lang', 'en')->first()
+				?: Services::where('slug', $slug)->first();
+		if (!$service) {
+			abort(404);
+		}
 		$service->packages_details = json_decode($service->packages_details, true);
 		$groupedData = [];
 		foreach ($service->packages_details as $item) {
@@ -200,9 +222,9 @@ class WebsiteController extends Controller
 		return view('website.pages.service', compact('service', 'groupedData', 'order'));
 	}
 
-	public function disclaimer () 
+	public function disclaimer ()
 	{
-		$disclaimer =  Disclaimer::find(1);
+		$disclaimer = $this->localized(Disclaimer::class);
 		return view('website.pages.disclaimer', compact('disclaimer'));
 	}
 
