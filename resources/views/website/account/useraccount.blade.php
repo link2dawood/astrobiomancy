@@ -19,19 +19,19 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-12">
-                            <label>Name</label>
+                            <label>{{ __('site.label_name') }}</label>
                             <input type="text" name="name" class="form-control"  value="{{Auth::user()->name}}">
                         </div>
                         <div class="col-md-12">
-                            <label>Email</label>
+                            <label>{{ __('site.label_email') }}</label>
                             <input type="email" name="email" class="form-control" value="{{Auth::user()->email}}" readonly>
                         </div>
                         <div class="col-md-12">
-                            <label>Password</label>
+                            <label>{{ __('site.label_password') }}</label>
                             <input type="password" name="password" class="form-control">
                         </div>
                         <div class="col-md-12">
-                            <button class="btn fw-500 btn-teal mt-2" type="submit">Update</button>
+                            <button class="btn fw-500 btn-teal mt-2" type="submit">{{ __('site.btn_update') }}</button>
                         </div>
                     </div>
                     </form>

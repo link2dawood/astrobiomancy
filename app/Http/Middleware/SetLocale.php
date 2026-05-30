@@ -13,6 +13,26 @@ class SetLocale
 
     public function handle($request, Closure $next)
     {
+        // Cookie-overrides-URL: when a returning visitor lands on a locale-prefixed
+        // URL that disagrees with their saved language, silently redirect to the
+        // equivalent path under their preferred locale. Only applies to GET so
+        // POST bodies (form submissions, etc.) are never lost to a 302.
+        if ($request->isMethod('GET')) {
+            $urlSegment = $request->segment(1);
+            $cookie     = $request->cookie(self::COOKIE);
+            if (
+                in_array($urlSegment, self::SUPPORTED, true)
+                && in_array($cookie, self::SUPPORTED, true)
+                && $cookie !== $urlSegment
+            ) {
+                $path = $request->path();
+                $newPath = preg_replace('#^' . $urlSegment . '#', $cookie, $path, 1);
+                $query = $request->getQueryString();
+                $target = '/' . $newPath . ($query ? '?' . $query : '');
+                return redirect($target, 302);
+            }
+        }
+
         $locale = $this->resolve($request);
 
         App::setLocale($locale);

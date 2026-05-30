@@ -6,8 +6,8 @@
         <div class="container px-5 text-center">
             <div class="row gx-5 justify-content-center">
                 <div class="col-lg-8">
-                    <h1 class="page-header-ui-title mb-0">Login</h1>
-                    <a href="{{url('create-account')}}" class="page-header-ui-text" style="color:white !important">Create Account</a>
+                    <h1 class="page-header-ui-title mb-0">{{ __('site.login_title') }}</h1>
+                    <a href="{{ url(app()->getLocale() . '/create-account') }}" class="page-header-ui-text" style="color:white !important">{{ __('site.register_title') }}</a>
                 </div>
             </div>
         </div>
@@ -44,14 +44,14 @@
 
                 <div class="col-md-6">
                     <br>
-                    <label class="text-dark mb-2" for="inputEmail">Email</label>
+                    <label class="text-dark mb-2" for="inputEmail">{{ __('site.label_email') }}</label>
 
-                    <input class="form-control py-4" id="inputEmail" type="email" placeholder="name@example.com" name="email" />
+                    <input class="form-control py-4" id="inputEmail" type="email" placeholder="{{ __('site.ph_email') }}" name="email" />
 
                 </div>
                 <div class="col-md-6">
                     <br>
-                    <label class="text-dark mb-2" for="inputEmail">Password</label>
+                    <label class="text-dark mb-2" for="inputEmail">{{ __('site.label_password') }}</label>
                     <input class="form-control py-4"  type="password" name="password" />
 
                 </div>
@@ -65,7 +65,7 @@
 
             
 
-            <div class="text-center"><button class="btn fw-500 ms-lg-4 btn-teal" type="submit">Login</button></div>
+            <div class="text-center"><button class="btn fw-500 ms-lg-4 btn-teal" type="submit">{{ __('site.btn_login') }}</button></div>
 
         </form>
 

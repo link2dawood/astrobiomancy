@@ -104,19 +104,19 @@
                             <form>
                                 <div class="row gx-5 mb-4">
                                     <div class="col-md-6">
-                                        <label class="text-dark mb-2" for="inputName">Full name</label>
-                                        <input class="form-control py-4" id="inputName" type="text" placeholder="Full name" />
+                                        <label class="text-dark mb-2" for="inputName">{{ __('site.label_fullname') }}</label>
+                                        <input class="form-control py-4" id="inputName" type="text" placeholder="{{ __('site.ph_fullname') }}" />
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="text-dark mb-2" for="inputEmail">Email</label>
-                                        <input class="form-control py-4" id="inputEmail" type="email" placeholder="name@example.com" />
+                                        <label class="text-dark mb-2" for="inputEmail">{{ __('site.label_email') }}</label>
+                                        <input class="form-control py-4" id="inputEmail" type="email" placeholder="{{ __('site.ph_email') }}" />
                                     </div>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="text-dark mb-2" for="inputMessage">Message</label>
-                                    <textarea class="form-control py-3" id="inputMessage" type="text" placeholder="Enter your message..." rows="4"></textarea>
+                                    <label class="text-dark mb-2" for="inputMessage">{{ __('site.label_message') }}</label>
+                                    <textarea class="form-control py-3" id="inputMessage" type="text" rows="4"></textarea>
                                 </div>
-                                <div class="text-center"><button class="btn btn-primary mt-4" type="submit">Submit Request</button></div>
+                                <div class="text-center"><button class="btn btn-primary mt-4" type="submit">{{ __('site.btn_submit') }}</button></div>
                             </form>
                         </div>
                         <div class="svg-border-rounded text-dark">

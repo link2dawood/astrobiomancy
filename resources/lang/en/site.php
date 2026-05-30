@@ -77,6 +77,14 @@ return [
     'label_fullname'    => 'Full name',
     'ph_fullname'       => 'Full name',
     'ph_email'          => 'name@example.com',
+    'label_name'        => 'Name',
+    'label_message'     => 'Message',
+    'label_comment'     => 'Comment',
+    'btn_update'        => 'Update',
+    'btn_post_comment'  => 'Submit',
+    'login_title'       => 'Login',
+    'register_title'    => 'Create Account',
+    'already_have_account' => 'Already have an account?',
 
     // Flash messages (controllers)
     'flash_verified'         => 'Your email address has been verified. You can now log in to continue.',

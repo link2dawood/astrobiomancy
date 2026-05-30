@@ -77,6 +77,14 @@ return [
     'label_fullname'    => 'Vollständiger Name',
     'ph_fullname'       => 'Vollständiger Name',
     'ph_email'          => 'name@beispiel.de',
+    'label_name'        => 'Name',
+    'label_message'     => 'Nachricht',
+    'label_comment'     => 'Kommentar',
+    'btn_update'        => 'Aktualisieren',
+    'btn_post_comment'  => 'Absenden',
+    'login_title'       => 'Anmelden',
+    'register_title'    => 'Konto erstellen',
+    'already_have_account' => 'Haben Sie bereits ein Konto?',
 
     // Flash-Meldungen
     'flash_verified'         => 'Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.',

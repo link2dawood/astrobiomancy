@@ -6,8 +6,8 @@
         <div class="container px-5 text-center">
             <div class="row gx-5 justify-content-center">
                 <div class="col-lg-8">
-                    <h1 class="page-header-ui-title mb-0">Create Account</h1>
-                    <a href="{{url('user/login')}}" class="page-header-ui-text" style="color:white !important">Already have an account?</a>
+                    <h1 class="page-header-ui-title mb-0">{{ __('site.register_title') }}</h1>
+                    <a href="{{ url(app()->getLocale() . '/user/login') }}" class="page-header-ui-text" style="color:white !important">{{ __('site.already_have_account') }}</a>
                 </div>
             </div>
         </div>
@@ -42,21 +42,21 @@
                 </div>
                 <div class="col-md-6">
                     <br>
-                    <label class="text-dark mb-2" for="inputName">Full name</label>
+                    <label class="text-dark mb-2" for="inputName">{{ __('site.label_fullname') }}</label>
 
-                    <input class="form-control py-4" id="inputName" type="text" placeholder="Full name" name="name" />
+                    <input class="form-control py-4" id="inputName" type="text" placeholder="{{ __('site.ph_fullname') }}" name="name" />
 
                 </div>
 
                 <div class="col-md-6">
                     <br>
-                    <label class="text-dark mb-2" for="inputEmail">Email</label>
+                    <label class="text-dark mb-2" for="inputEmail">{{ __('site.label_email') }}</label>
 
-                    <input class="form-control py-4" id="inputEmail" type="email" placeholder="name@example.com" name="email" />
+                    <input class="form-control py-4" id="inputEmail" type="email" placeholder="{{ __('site.ph_email') }}" name="email" />
 
                 </div>
                 <div class="col-md-6">
-                    <label class="text-dark mb-2" for="inputEmail">Password</label>
+                    <label class="text-dark mb-2" for="inputEmail">{{ __('site.label_password') }}</label>
                     <input class="form-control py-4"  type="password" name="password" />
 
                 </div>
@@ -70,7 +70,7 @@
             
             
 
-            <div class="text-center"><button class="btn fw-500 ms-lg-4 btn-teal" type="submit">Register</button></div>
+            <div class="text-center"><button class="btn fw-500 ms-lg-4 btn-teal" type="submit">{{ __('site.btn_register') }}</button></div>
 
         </form>
 

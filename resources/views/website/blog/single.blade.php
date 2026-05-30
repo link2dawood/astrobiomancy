@@ -47,23 +47,23 @@
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
-                            <label class="text-dark mb-2" for="inputName">Full name</label>
-                            <input class="form-control py-4" type="text" name="fullname" placeholder="Full name" required/>
+                            <label class="text-dark mb-2" for="inputName">{{ __('site.label_fullname') }}</label>
+                            <input class="form-control py-4" type="text" name="fullname" placeholder="{{ __('site.ph_fullname') }}" required/>
                         </div>
                         <div class="col-md-6">
-                            <label class="text-dark mb-2" for="inputName">Email</label>
-                            <input class="form-control py-4" type="email" name="email" placeholder="Email" required />
+                            <label class="text-dark mb-2" for="inputName">{{ __('site.label_email') }}</label>
+                            <input class="form-control py-4" type="email" name="email" placeholder="{{ __('site.ph_email') }}" required />
                             <input class="form-control py-4" type="hidden" name="post_id" value="{{$post->id}}" />
                         </div>
                         <div class="col-md-12 mt-2">
-                            <label class="text-dark mb-2" for="inputName">Comment</label>
+                            <label class="text-dark mb-2" for="inputName">{{ __('site.label_comment') }}</label>
                             <textarea class="form-control" name="comments" required></textarea>
                         </div>
                         <div class="col-md-12 mt-2">
                             <div class="g-recaptcha" data-sitekey="6LfM4nYqAAAAAPIWFdST6RQWSHIlqC8BeRliJcj3"></div>
                         </div>
                         <div class="col-md-12 mt-2">
-                           <div class="text-center"><button class="btn btn-primary mt-4" type="submit">Submit </button></div>
+                           <div class="text-center"><button class="btn btn-primary mt-4" type="submit">{{ __('site.btn_post_comment') }}</button></div>
                        </div>
                    </div>
                </form>
