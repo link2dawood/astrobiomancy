@@ -21,6 +21,15 @@
     @endforeach
     <link rel="alternate" hreflang="x-default" href="{{ url('/en' . ($stripped ? '/' . $stripped : '')) }}" />
 
+    {{-- Favicon: ICO at the document root + an explicit PNG declaration so
+         the brand icon wins over any cached Laravel-error favicon. Drop a
+         32x32 (and optionally 192x192) PNG of your logo into
+         public/website/img/ to replace the fallback. --}}
+    <link rel="icon" type="image/x-icon" href="{{ url('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('public/website/img/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('public/website/img/favicon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ url('public/website/img/favicon-192.png') }}">
+
     <link href="{{url('public/website/css/styles.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/aos%403.0.0-beta.6/dist/aos.css" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
