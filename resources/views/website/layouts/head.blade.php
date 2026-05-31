@@ -21,12 +21,13 @@
     @endforeach
     <link rel="alternate" hreflang="x-default" href="{{ url('/en' . ($stripped ? '/' . $stripped : '')) }}" />
 
-    {{-- Favicon — declared explicitly so the brand icon beats any cached
-         Laravel-error favicon. PNGs live at public/ root (uploaded by the
-         site owner). favicon.ico is 0 bytes on disk so we skip linking it. --}}
-    <link rel="icon" type="image/png" sizes="32x32"   href="{{ url('public/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ url('public/favicon-192.png') }}">
-    <link rel="apple-touch-icon"                      href="{{ url('public/favicon-192.png') }}">
+    {{-- Favicon: client-uploaded 32px icon, used for every size. Browsers
+         will upscale it for the high-DPI / apple-touch slots — replace
+         the path here if a larger version is uploaded later. --}}
+    @php $favicon = url('public/uploads/images/1780234486.png'); @endphp
+    <link rel="icon" type="image/png" sizes="32x32"   href="{{ $favicon }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ $favicon }}">
+    <link rel="apple-touch-icon"                      href="{{ $favicon }}">
 
     <link href="{{url('public/website/css/styles.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/aos%403.0.0-beta.6/dist/aos.css" />
