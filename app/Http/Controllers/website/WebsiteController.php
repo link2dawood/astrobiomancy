@@ -200,18 +200,26 @@ class WebsiteController extends Controller
 		if (!$service) {
 			abort(404);
 		}
-		$service->packages_details = json_decode($service->packages_details, true);
+
+		// Packages (pricing JSON) are shared across languages in practice.
+		// If the localized row has no packages, fall back to the EN row so the
+		// page still renders with German copy + shared price structure.
+		$packagesRaw = $service->packages_details;
+		$packages = is_string($packagesRaw) ? json_decode($packagesRaw, true) : null;
+		if (empty($packages) && $service->lang !== 'en') {
+			$enService = Services::where('slug', $slug)->where('lang', 'en')->first();
+			if ($enService && $enService->packages_details) {
+				$packages = json_decode($enService->packages_details, true);
+			}
+		}
+		$service->packages_details = is_array($packages) ? $packages : [];
+
 		$groupedData = [];
 		foreach ($service->packages_details as $item) {
-			$name = $item['package_name'];
-
-		    // Check if the group exists
+			$name = $item['package_name'] ?? '';
 			if (!isset($groupedData[$name])) {
-		        // If the group doesn't exist, create it
 				$groupedData[$name] = [];
 			}
-
-		    // Add the item to the group
 			$groupedData[$name][] = $item;
 		}
 		$order =[];
