@@ -51,7 +51,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{$post->title}}</h5>
                         <p class="card-text">
-                            {{ \Illuminate\Support\Str::limit(trim(strip_tags($post->description)), 150) }}
+                            {{ \Illuminate\Support\Str::limit(trim(html_entity_decode(strip_tags($post->description), ENT_QUOTES, 'UTF-8')), 150) }}
                         </p>
                     </div>
                     <div class="card-footer">

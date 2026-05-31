@@ -54,7 +54,7 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $t->name }}</td>
-                                                <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($t->content)), 80) }}</td>
+                                                <td>{{ \Illuminate\Support\Str::limit(trim(html_entity_decode(strip_tags($t->content), ENT_QUOTES, 'UTF-8')), 80) }}</td>
                                                 <td>{{ optional($t->display_date)->format('Y-m-d') ?? '—' }}</td>
                                                 <td>
                                                     <span class="badge {{ $t->status === 'Published' ? 'badge-success' : 'badge-warning' }}">

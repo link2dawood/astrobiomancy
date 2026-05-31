@@ -33,7 +33,7 @@
                             <div class="card-body p-4 d-flex flex-column">
                                 <div class="mb-3" style="color:#ff9536; font-size: 1.6rem; line-height: 1;">&ldquo;</div>
                                 <p class="text-dark mb-4" style="font-style: italic; line-height: 1.6;">
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($t->content), 320) }}
+                                    {{ \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($t->content), ENT_QUOTES, 'UTF-8'), 320) }}
                                 </p>
                                 <div class="d-flex align-items-center mt-auto">
                                     @if ($t->photo)

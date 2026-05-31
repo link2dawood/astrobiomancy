@@ -142,7 +142,7 @@
                                         <div class="card-body p-4">
                                             <div style="color:#ff9536; font-size:1.6rem; line-height:1;">&ldquo;</div>
                                             <p class="text-dark" style="font-style:italic; line-height:1.6;">
-                                                {{ \Illuminate\Support\Str::limit(strip_tags($t->content), 260) }}
+                                                {{ \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($t->content), ENT_QUOTES, 'UTF-8'), 260) }}
                                             </p>
                                             <div class="d-flex align-items-center mt-3">
                                                 @if ($t->photo)
