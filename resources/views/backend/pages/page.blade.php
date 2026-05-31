@@ -38,13 +38,13 @@
                                             <form action="{{ url('/dashboard/pages/update') }}" method="POST" enctype="multipart/form-data">
                                                 {{ Form::input('hidden', '_token', csrf_token()) }}
                                                 <input type="hidden" name="id" value="{{ $page->id ?? '' }}">
+                                                <input type="hidden" name="slug" value="{{ $slug }}">
                                                 <input type="hidden" name="_save_lang" value="{{ $code }}">
 
                                                 @if(empty($page) || empty($page->id))
-                                                    <div class="alert alert-warning">
+                                                    <div class="alert alert-info">
                                                         No <strong>{{ strtoupper($code) }}</strong> version of this page exists yet.
-                                                        Saving below will fail — create the row first via the database or the generic page-create flow.
-                                                        (Tip: copy the EN row and change <code>lang</code>.)
+                                                        Type the {{ strtoupper($code) }} content below and click <em>Save {{ strtoupper($code) }}</em> — a new row will be created. The other language is not affected.
                                                     </div>
                                                 @endif
 
@@ -77,11 +77,11 @@
                                                 </div>
 
                                                 <div class="form-group" style="margin-top:20px">
-                                                    <button type="submit" class="btn btn-sm btn-primary" {{ empty($page->id) ? 'disabled' : '' }}>
+                                                    <button type="submit" class="btn btn-sm btn-primary">
                                                         Save {{ strtoupper($code) }}
                                                     </button>
                                                     <small class="text-muted" style="margin-left:1rem">
-                                                        Saves the {{ strtoupper($code) }} version only.
+                                                        Saves the {{ strtoupper($code) }} version only. The other language is untouched.
                                                     </small>
                                                 </div>
                                             </form>

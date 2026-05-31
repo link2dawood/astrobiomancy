@@ -104,25 +104,49 @@ class PagesController extends Controller
     {
         $pages = [];
         foreach ($this->locales() as $loc) {
-            $pages[$loc] = Pages::where('slug', $slug)->where('lang', $loc)->first()
-                        ?: Pages::where('slug', $slug)->first(); // graceful fallback for legacy rows
+            // No cross-language fallback here — that previously caused the
+            // DE form's hidden id to point at the EN row, so saving DE
+            // overwrote EN. Leave the tab empty when no row exists for
+            // this locale, and let update() create it on save.
+            $pages[$loc] = Pages::where('slug', $slug)->where('lang', $loc)->first();
         }
         return view('backend.pages.page', compact('pages', 'slug'));
     }
 
     /**
-     * Generic page row update by id (each row is per-language).
+     * Create or update a page row, scoped strictly to (id, lang). Each form
+     * tab posts its own _save_lang and slug so a missing id triggers an
+     * insert into the correct language slot rather than overwriting another
+     * language's existing row.
      */
     public function update(Request $request)
     {
-        $pages = Pages::findOrFail($request->id);
-        $pages->main_heading    = $request->main_heading;
-        $pages->second_heading  = $request->second_heading;
-        $pages->description     = $request->description;
+        $lang = in_array($request->_save_lang, $this->locales(), true)
+            ? $request->_save_lang
+            : SetLocale::DEFAULT;
+
+        if ($request->filled('id')) {
+            $pages = Pages::findOrFail($request->id);
+            // Safety: if the row's lang doesn't match the form's lang, refuse
+            // to update it. Prevents cross-language overwrites if the form is
+            // tampered with.
+            if ($pages->lang && $pages->lang !== $lang) {
+                return back()->with('error', 'Refused to save: row language does not match the form language.');
+            }
+        } else {
+            $pages = new Pages();
+            $pages->slug = $request->slug ?: $request->input('_slug');
+        }
+
+        $pages->lang             = $lang;
+        $pages->main_heading     = $request->main_heading;
+        $pages->second_heading   = $request->second_heading;
+        $pages->description      = $request->description;
         $pages->meta_title       = $request->meta_title;
         $pages->meta_description = $request->meta_description;
         $pages->save();
-        return back()->with('message', 'add');
+
+        return back()->with('message', $request->filled('id') ? 'update' : 'add');
     }
 
     public function about()
