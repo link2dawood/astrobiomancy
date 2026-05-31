@@ -35,7 +35,22 @@
 
                                 <div class="tab-content">
                                     @foreach (['en' => 'English', 'de' => 'Deutsch'] as $code => $label)
-                                        @php $row = $rows[$code] ?? null; @endphp
+                                        @php
+                                            $row = $rows[$code] ?? null;
+                                            $packages = ($row && $row->packages_details)
+                                                ? (is_string($row->packages_details) ? json_decode($row->packages_details, true) : $row->packages_details)
+                                                : [];
+                                            $packages = is_array($packages) ? $packages : [];
+
+                                            // If the DE tab has no packages of its own, seed from the EN tab so editors
+                                            // see the existing structure and can translate the labels.
+                                            if (empty($packages) && $code !== 'en' && isset($rows['en']) && $rows['en']->packages_details) {
+                                                $seed = json_decode($rows['en']->packages_details, true);
+                                                if (is_array($seed)) {
+                                                    $packages = $seed;
+                                                }
+                                            }
+                                        @endphp
                                         <div class="tab-pane {{ $loop->first ? 'active show' : '' }}" id="svc-{{ $code }}" role="tabpanel">
                                             <form action="{{ url('dashboard/services/save') }}" method="POST" enctype="multipart/form-data">
                                                 {{ Form::input('hidden', '_token', csrf_token()) }}
@@ -70,12 +85,73 @@
                                                     </div>
                                                 </div>
 
+                                                {{-- Packages editor (per language) --}}
+                                                <hr style="margin: 24px 0 16px;">
+                                                <div class="d-flex justify-content-between align-items-center" style="margin-bottom:8px;">
+                                                    <h5 style="margin:0;">Packages ({{ strtoupper($code) }})</h5>
+                                                    <button type="button" class="btn btn-sm btn-primary add-pkg" data-lang="{{ $code }}">+ Add package</button>
+                                                </div>
+                                                <small class="text-muted d-block" style="margin-bottom:12px;">
+                                                    Each row is one purchasable option. Group rows under the same <em>Package name</em> to make them appear together on the public page.
+                                                </small>
+
+                                                <div class="pkg-list-{{ $code }}">
+                                                    @foreach ($packages as $key => $pkg)
+                                                        <div class="card pkg-row-{{ $code }}-{{ $key }}" style="margin-bottom:12px; padding:12px; background:#fafafa;">
+                                                            <div class="row">
+                                                                <div class="col-md-4">
+                                                                    <label class="control-label">Package name</label>
+                                                                    <input type="text" name="package_name[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['package_name'] ?? '' }}" placeholder="e.g. Energy work (full session)">
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="control-label">Details (line shown to buyer)</label>
+                                                                    <input type="text" name="package_details[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['package_details'] ?? '' }}" placeholder="e.g. 45 minutes: 80 Euro">
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="control-label">Amount</label>
+                                                                    <input type="text" name="package_amount[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['package_amount'] ?? '' }}" placeholder="80">
+                                                                </div>
+                                                                <div class="col-md-2">
+                                                                    <label class="control-label">Questions</label>
+                                                                    <input type="number" name="number_of_question[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['number_of_question'] ?? '' }}" placeholder="1">
+                                                                </div>
+                                                                <div class="col-md-6" style="margin-top:10px;">
+                                                                    <label class="control-label">Terms / fine print</label>
+                                                                    <input type="text" name="package_details_terms[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['package_details_terms'] ?? '' }}">
+                                                                </div>
+                                                                <div class="col-md-3" style="margin-top:10px;">
+                                                                    <label class="control-label">Package ID</label>
+                                                                    <input type="text" name="package_id[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['package_id'] ?? '' }}">
+                                                                </div>
+                                                                <div class="col-md-3" style="margin-top:10px;">
+                                                                    <label class="control-label">Customer question page</label>
+                                                                    <input type="text" name="customer_ask_question_page[{{ $code }}][]" class="form-control"
+                                                                           value="{{ $pkg['customer_ask_question_page'] ?? '' }}">
+                                                                </div>
+                                                                <div class="col-md-12" style="margin-top:10px; text-align:right;">
+                                                                    <button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="{{ $code }}" data-key="{{ $key }}">Remove this package</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
                                                 <div class="form-group" style="margin-top:20px">
                                                     <button type="submit" class="btn btn-sm btn-primary">Save {{ strtoupper($code) }}</button>
                                                     <small class="text-muted" style="margin-left:1rem">
-                                                        Saves the {{ strtoupper($code) }} version only.
+                                                        Saves the {{ strtoupper($code) }} version only — including its packages.
                                                     </small>
                                                 </div>
+
+                                                <script>
+                                                    window.pkgCount_{{ $code }} = {{ count($packages) }};
+                                                </script>
                                             </form>
                                         </div>
                                     @endforeach
@@ -101,6 +177,44 @@
             });
         });
     }
+
+    document.addEventListener('click', function (e) {
+        var addBtn = e.target.closest('.add-pkg');
+        if (addBtn) {
+            var lang = addBtn.getAttribute('data-lang');
+            var i = window['pkgCount_' + lang]++;
+            var html =
+                '<div class="card pkg-row-' + lang + '-' + i + '" style="margin-bottom:12px; padding:12px; background:#fafafa;">' +
+                  '<div class="row">' +
+                    '<div class="col-md-4"><label class="control-label">Package name</label>' +
+                      '<input type="text" name="package_name[' + lang + '][]" class="form-control" placeholder="e.g. Energy work (full session)"></div>' +
+                    '<div class="col-md-4"><label class="control-label">Details (line shown to buyer)</label>' +
+                      '<input type="text" name="package_details[' + lang + '][]" class="form-control" placeholder="e.g. 45 minutes: 80 Euro"></div>' +
+                    '<div class="col-md-2"><label class="control-label">Amount</label>' +
+                      '<input type="text" name="package_amount[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-2"><label class="control-label">Questions</label>' +
+                      '<input type="number" name="number_of_question[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-6" style="margin-top:10px;"><label class="control-label">Terms / fine print</label>' +
+                      '<input type="text" name="package_details_terms[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-3" style="margin-top:10px;"><label class="control-label">Package ID</label>' +
+                      '<input type="text" name="package_id[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-3" style="margin-top:10px;"><label class="control-label">Customer question page</label>' +
+                      '<input type="text" name="customer_ask_question_page[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-12" style="margin-top:10px; text-align:right;">' +
+                      '<button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="' + lang + '" data-key="' + i + '">Remove this package</button></div>' +
+                  '</div>' +
+                '</div>';
+            document.querySelector('.pkg-list-' + lang).insertAdjacentHTML('beforeend', html);
+            return;
+        }
+        var rmBtn = e.target.closest('.pkg-remove');
+        if (rmBtn) {
+            var lang = rmBtn.getAttribute('data-lang');
+            var key  = rmBtn.getAttribute('data-key');
+            var card = document.querySelector('.pkg-row-' + lang + '-' + key);
+            if (card) card.remove();
+        }
+    });
 </script>
 </body>
 </html>

@@ -25,13 +25,12 @@
 }
 </style>
 <!-- Page Header-->
-<header class="page-header-ui page-header-ui-dark bg-img-cover overlay overlay-60" style="background-image: url(https://source.unsplash.com/PTRzqc_h1r4/1600x900)">
-    <div class="page-header-ui-content position-relative">
+<header class="page-header-ui page-header-ui-dark bg-gradient-primary-to-secondary" style="background: #ff9536 !important;">
+    <div class="page-header-ui-content pt-10">
         <div class="container px-5 text-center">
             <div class="row gx-5 justify-content-center">
                 <div class="col-lg-8">
-                    <h1 class="page-header-ui-title mb-3">POSTS</h1>
-                   
+                    <h1 class="page-header-ui-title mb-3">{{ __('site.nav_blog') }}</h1>
                 </div>
             </div>
         </div>
