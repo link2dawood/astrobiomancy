@@ -82,6 +82,7 @@ return [
     'label_comment'     => 'Comment',
     'btn_update'        => 'Update',
     'btn_post_comment'  => 'Submit',
+    'btn_buy_now'       => 'Buy Now',
     'login_title'       => 'Login',
     'register_title'    => 'Create Account',
     'already_have_account' => 'Already have an account?',

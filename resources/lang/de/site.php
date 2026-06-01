@@ -82,6 +82,7 @@ return [
     'label_comment'     => 'Kommentar',
     'btn_update'        => 'Aktualisieren',
     'btn_post_comment'  => 'Absenden',
+    'btn_buy_now'       => 'Kaufen',
     'login_title'       => 'Anmelden',
     'register_title'    => 'Konto erstellen',
     'already_have_account' => 'Haben Sie bereits ein Konto?',
