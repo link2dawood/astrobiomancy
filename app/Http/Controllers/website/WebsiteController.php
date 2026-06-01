@@ -105,8 +105,11 @@ class WebsiteController extends Controller
 						return redirect()->intended(app()->getLocale() . '/users/account');
 					} else {
 						Auth::logout();
+						// Account exists but isn't verified. Generate a fresh
+						// token + actually resend the verification email so the
+						// "we sent you a link" message is truthful.
+						$this->resendVerification($user);
 						return redirect()->back()->with('error', __('site.flash_verify_required'));
-
 					}
 				}else{
 					return redirect()->back()->with('error', __('site.flash_invalid_login'));
@@ -410,6 +413,38 @@ class WebsiteController extends Controller
 
 		}
 
+
+		/**
+		 * Generate a fresh verification token and send the verification email
+		 * to an unverified user. Used both at signup and when an unverified
+		 * user attempts to log in (so the "we sent a link" flash is truthful).
+		 *
+		 * Errors are swallowed and logged — a transient mail failure must not
+		 * break the login flow.
+		 */
+		private function resendVerification($user)
+		{
+			try {
+				$user->account_token = md5(rand(10000, 1000000000000000));
+				$user->save();
+
+				$subject    = __('site.mail_subject_register');
+				$email_data = [
+					'verfiylink' => url(app()->getLocale() . '/account-verfiy/' . $user->account_token),
+					'name'       => $user->name,
+				];
+				$to_email = $user->email;
+
+				\Mail::send('mail.register', $email_data, function ($message) use ($to_email, $subject) {
+					$message->to($to_email)->subject($subject);
+					if (env('MAIL_FROM_ADDRESS')) {
+						$message->from(env('MAIL_FROM_ADDRESS'));
+					}
+				});
+			} catch (\Throwable $e) {
+				\Log::error('Verification email failed for ' . ($user->email ?? '?') . ': ' . $e->getMessage());
+			}
+		}
 
 		public function deleteUnverifiedUserCron(){
 			
