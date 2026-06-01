@@ -270,18 +270,42 @@ class WebsiteController extends Controller
 			return redirect()->back()->with('error', __('site.flash_captcha_invalid'));
 		}
 	}
-	public function singlePost ( $slug ) 
+	public function singlePost ( $slug )
 	{
-		$post = Blog::where('slug', $slug)
-			->where('status', 'Published')
-			->first();
-		if (!isset($post->id)) {
-			abort(404);
-		}
 		$settings = Settings::first();
 		if (isset($settings->enable_blog) && $settings->enable_blog==='0') {
 			abort(404);
 		}
+
+		$loc = app()->getLocale();
+
+		// First preference: the post in the active locale.
+		$post = Blog::where('slug', $slug)
+			->where('lang', $loc)
+			->where('status', 'Published')
+			->first();
+
+		// If the slug belongs to a post in another locale, redirect to the
+		// localized counterpart's slug so the URL, language, and content
+		// stay consistent. Falls back to /{locale}/blog if no translation.
+		if (!$post) {
+			$other = Blog::where('slug', $slug)->where('status', 'Published')->first();
+			if ($other) {
+				$parentId = $other->translation_of ?: $other->id;
+				$sibling = Blog::where('lang', $loc)
+					->where('status', 'Published')
+					->where(function ($q) use ($parentId) {
+						$q->where('id', $parentId)->orWhere('translation_of', $parentId);
+					})
+					->first();
+				if ($sibling) {
+					return redirect('/' . $loc . '/post/' . $sibling->slug, 301);
+				}
+				return redirect('/' . $loc . '/blog');
+			}
+			abort(404);
+		}
+
 		$comments = Comments::where('post_id', $post->id)->orderBy('id', 'DESC')->get();
 		return view('website.blog.single', compact('post', 'comments'));
 	}

@@ -29,10 +29,18 @@ class LocaleController extends Controller
             $parts = parse_url($referer);
             $path  = $parts['path'] ?? '/';
 
-            // Drop any existing locale prefix, then prepend the new one.
+            // Drop any existing locale prefix.
             $supported = implode('|', SetLocale::SUPPORTED);
             $stripped  = preg_replace('#^/(' . $supported . ')(?=/|$)#', '', $path);
             $stripped  = $stripped === '' ? '/' : $stripped;
+
+            // Blog posts have per-language slugs. Looking up the translation
+            // counterpart so /en/post/foo correctly becomes /de/post/{foo-de}
+            // rather than the non-existent /de/post/foo.
+            if (preg_match('#^/post/([^/]+)/?$#', $stripped, $m)) {
+                $localized = $this->localizedBlogSlug($m[1], $switch_to);
+                $stripped  = $localized ? '/post/' . $localized : '/blog';
+            }
 
             $target = '/' . $switch_to . ($stripped === '/' ? '' : $stripped);
 
@@ -42,6 +50,32 @@ class LocaleController extends Controller
         }
 
         return redirect($target)->cookie(SetLocale::COOKIE, $switch_to, 60 * 24 * 365);
+    }
+
+    /**
+     * Find the slug of the same blog post in another language. Returns null
+     * if no translation exists. Walks both directions of the translation_of
+     * link so it works whether the source is the original or the translation.
+     */
+    private function localizedBlogSlug($sourceSlug, $targetLang)
+    {
+        $source = \App\Models\Blog::where('slug', $sourceSlug)->first();
+        if (!$source) {
+            return null;
+        }
+        if ($source->lang === $targetLang) {
+            return $source->slug;
+        }
+
+        $parentId = $source->translation_of ?: $source->id;
+
+        $sibling = \App\Models\Blog::where('lang', $targetLang)
+            ->where(function ($q) use ($parentId) {
+                $q->where('id', $parentId)->orWhere('translation_of', $parentId);
+            })
+            ->first();
+
+        return $sibling ? $sibling->slug : null;
     }
 
     /**
