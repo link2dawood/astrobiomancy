@@ -119,20 +119,23 @@
                                                                     <input type="number" name="number_of_question[{{ $code }}][]" class="form-control"
                                                                            value="{{ $pkg['number_of_question'] ?? '' }}" placeholder="1">
                                                                 </div>
-                                                                <div class="col-md-6" style="margin-top:10px;">
+                                                                <div class="col-md-8" style="margin-top:10px;">
                                                                     <label class="control-label">Terms / fine print</label>
                                                                     <input type="text" name="package_details_terms[{{ $code }}][]" class="form-control"
                                                                            value="{{ $pkg['package_details_terms'] ?? '' }}">
                                                                 </div>
-                                                                <div class="col-md-3" style="margin-top:10px;">
+                                                                <div class="col-md-4" style="margin-top:10px;">
                                                                     <label class="control-label">Package ID</label>
                                                                     <input type="text" name="package_id[{{ $code }}][]" class="form-control"
                                                                            value="{{ $pkg['package_id'] ?? '' }}">
                                                                 </div>
-                                                                <div class="col-md-3" style="margin-top:10px;">
+                                                                <div class="col-md-12" style="margin-top:10px;">
                                                                     <label class="control-label">Customer question page</label>
-                                                                    <input type="text" name="customer_ask_question_page[{{ $code }}][]" class="form-control"
-                                                                           value="{{ $pkg['customer_ask_question_page'] ?? '' }}">
+                                                                    <small class="text-muted d-block" style="margin-bottom:6px;">
+                                                                        Email body sent to the buyer after purchase. HTML allowed (e.g. <code>&lt;p&gt;</code>, <code>&lt;br&gt;</code>).
+                                                                    </small>
+                                                                    <textarea name="customer_ask_question_page[{{ $code }}][]" class="form-control"
+                                                                              rows="6" style="font-family: inherit;">{{ $pkg['customer_ask_question_page'] ?? '' }}</textarea>
                                                                 </div>
                                                                 <div class="col-md-12" style="margin-top:10px; text-align:right;">
                                                                     <button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="{{ $code }}" data-key="{{ $key }}">Remove this package</button>
@@ -194,12 +197,14 @@
                       '<input type="text" name="package_amount[' + lang + '][]" class="form-control"></div>' +
                     '<div class="col-md-2"><label class="control-label">Questions</label>' +
                       '<input type="number" name="number_of_question[' + lang + '][]" class="form-control"></div>' +
-                    '<div class="col-md-6" style="margin-top:10px;"><label class="control-label">Terms / fine print</label>' +
+                    '<div class="col-md-8" style="margin-top:10px;"><label class="control-label">Terms / fine print</label>' +
                       '<input type="text" name="package_details_terms[' + lang + '][]" class="form-control"></div>' +
-                    '<div class="col-md-3" style="margin-top:10px;"><label class="control-label">Package ID</label>' +
+                    '<div class="col-md-4" style="margin-top:10px;"><label class="control-label">Package ID</label>' +
                       '<input type="text" name="package_id[' + lang + '][]" class="form-control"></div>' +
-                    '<div class="col-md-3" style="margin-top:10px;"><label class="control-label">Customer question page</label>' +
-                      '<input type="text" name="customer_ask_question_page[' + lang + '][]" class="form-control"></div>' +
+                    '<div class="col-md-12" style="margin-top:10px;">' +
+                      '<label class="control-label">Customer question page</label>' +
+                      '<small class="text-muted d-block" style="margin-bottom:6px;">Email body sent to the buyer after purchase. HTML allowed.</small>' +
+                      '<textarea name="customer_ask_question_page[' + lang + '][]" class="form-control" rows="6" style="font-family: inherit;"></textarea></div>' +
                     '<div class="col-md-12" style="margin-top:10px; text-align:right;">' +
                       '<button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="' + lang + '" data-key="' + i + '">Remove this package</button></div>' +
                   '</div>' +
