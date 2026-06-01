@@ -154,9 +154,9 @@ class WebsiteController extends Controller
 				$email_data = ['verfiylink'=>url(app()->getLocale() . '/account-verfiy/'.$random_number), 'name'=>$request->name];
 				$to_email= $request->email;
 				\Mail::send('mail.register', $email_data, function($message) use( $to_email, $subject) {
-					$message->to($to_email)->subject
-					($subject);
-					$message->from(env('MAIL_FROM_ADDRESS'));
+					// Default From comes from config/mail.php; don't call
+					// env() at runtime — it returns null under config:cache.
+					$message->to($to_email)->subject($subject);
 				});
 
 				return redirect(app()->getLocale() . '/user/login')->with('success', __('site.flash_account_created'));
@@ -380,7 +380,8 @@ class WebsiteController extends Controller
 			$data = ['order'=>$orders,'user'=>Auth::user()];
 			\Mail::send('mail.orderconfirm', $data, function ($message) use($toemail) {
 				$message->to($toemail)
-				->subject("Great news: You've received an order from astrobiomancy.com")->from(env('MAIL_FROM_ADDRESS'));
+					->subject("Great news: You've received an order from astrobiomancy.com");
+				// Default From handled by config/mail.php
 			});
 		}
 
@@ -436,10 +437,12 @@ class WebsiteController extends Controller
 				$to_email = $user->email;
 
 				\Mail::send('mail.register', $email_data, function ($message) use ($to_email, $subject) {
+					// Don't set from() here — Laravel pulls the default From
+					// from config/mail.php (which reads MAIL_FROM_ADDRESS at
+					// boot). Calling env() at runtime returns null when
+					// config is cached, which previously caused "Cannot send
+					// message without a sender address".
 					$message->to($to_email)->subject($subject);
-					if (env('MAIL_FROM_ADDRESS')) {
-						$message->from(env('MAIL_FROM_ADDRESS'));
-					}
 				});
 			} catch (\Throwable $e) {
 				\Log::error('Verification email failed for ' . ($user->email ?? '?') . ': ' . $e->getMessage());
