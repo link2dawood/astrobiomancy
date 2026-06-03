@@ -102,11 +102,6 @@
         </div>
     </div>
 </div>
-<div class="svg-border-rounded text-dark">
-    <!-- Rounded SVG Border-->
-   <hr class="m-0 p-0">
-   <br>
-</div>
 </section>
 
 @endsection
