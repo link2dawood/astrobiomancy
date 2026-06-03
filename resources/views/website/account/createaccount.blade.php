@@ -21,8 +21,8 @@
     </div>
 
 </header>
-<section class="bg-white pb-5" style="background: #feefd2 !important">
-    <div class="container px-5">
+<section class="bg-white" style="background: #feefd2 !important">
+    <div class="container px-5 pb-5">
         <form class="" action="{{url('create-account')}}" method="POST" onsubmit="return validate_form(this)">
             @csrf
             <div class="row gx-5 mb-4">
