@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'Service '.$service->main_heading)
+@section('title', $service->meta_title ?? $service->main_heading)
 @section('content')
 <style>
 .second-step {

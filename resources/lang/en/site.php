@@ -86,6 +86,7 @@ return [
     'login_title'       => 'Login',
     'register_title'    => 'Create Account',
     'already_have_account' => 'Already have an account?',
+    'contact_title'     => 'Contact us',
 
     // Flash messages (controllers)
     'flash_verified'         => 'Your email address has been verified. You can now log in to continue.',

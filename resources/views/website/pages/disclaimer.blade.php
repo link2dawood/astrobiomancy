@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'Home ')
+@section('title', $disclaimer->meta_title ?? __('site.footer_disclaimer'))
 @section('content')
 <header class="page-header-ui page-header-ui-dark bg-gradient-primary-to-secondary" style="    background: #ff9536 !important;">
 <div class="page-header-ui-content pt-10">

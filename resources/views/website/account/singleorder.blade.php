@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'User Account ')
+@section('title', __('site.nav_account'))
 @section('content')
 <style>
     

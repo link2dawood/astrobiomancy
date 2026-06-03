@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'About Us ')
+@section('title', $aboutus->meta_title ?? __('site.nav_about'))
 @section('content')
 <header class="page-header-ui page-header-ui-dark bg-gradient-primary-to-secondary" style="    background: #ff9536 !important;">
 <div class="page-header-ui-content pt-10">

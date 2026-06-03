@@ -38,7 +38,6 @@
                                             <form action="{{ url('/dashboard/pages/update') }}" method="POST" enctype="multipart/form-data">
                                                 {{ Form::input('hidden', '_token', csrf_token()) }}
                                                 <input type="hidden" name="id" value="{{ $page->id ?? '' }}">
-                                                <input type="hidden" name="slug" value="{{ $slug }}">
                                                 <input type="hidden" name="_save_lang" value="{{ $code }}">
 
                                                 @if(empty($page) || empty($page->id))
@@ -49,12 +48,26 @@
                                                 @endif
 
                                                 <div class="row">
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-12">
+                                                        <label class="control-label">URL slug ({{ strtoupper($code) }})</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text text-muted">/{{ $code }}/page/</span>
+                                                            <input type="text" name="slug" class="form-control"
+                                                                   value="{{ $page->slug ?? $slug }}"
+                                                                   pattern="[a-z0-9\-]+"
+                                                                   placeholder="e.g. the-vibration-series">
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            Lowercase letters, numbers and dashes only.
+                                                            Changing this breaks existing links and bookmarks — only edit if you know what you're doing.
+                                                        </small>
+                                                    </div>
+                                                    <div class="col-md-6" style="margin-top:15px">
                                                         <label class="control-label">Main Heading ({{ strtoupper($code) }})</label>
                                                         <input type="text" name="main_heading" class="form-control"
                                                                value="{{ $page->main_heading ?? '' }}">
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-6" style="margin-top:15px">
                                                         <label class="control-label">Second Heading ({{ strtoupper($code) }})</label>
                                                         <input type="text" name="second_heading" class="form-control"
                                                                value="{{ $page->second_heading ?? '' }}">

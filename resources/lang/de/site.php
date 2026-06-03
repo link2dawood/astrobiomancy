@@ -86,6 +86,7 @@ return [
     'login_title'       => 'Anmelden',
     'register_title'    => 'Konto erstellen',
     'already_have_account' => 'Haben Sie bereits ein Konto?',
+    'contact_title'     => 'Kontakt',
 
     // Flash-Meldungen
     'flash_verified'         => 'Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.',

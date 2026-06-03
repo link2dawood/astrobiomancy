@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'User Account ')
+@section('title', __('site.nav_account'))
 @section('content')
 <section class="bg-light pt-15 " style="background: #feefd2 !important">
 <div class="container px-5">

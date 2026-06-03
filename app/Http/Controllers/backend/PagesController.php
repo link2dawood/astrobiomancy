@@ -125,6 +125,11 @@ class PagesController extends Controller
             ? $request->_save_lang
             : SetLocale::DEFAULT;
 
+        // Sanitize requested slug — lowercase + a-z 0-9 dash only.
+        $requestedSlug = strtolower(trim((string) $request->slug));
+        $requestedSlug = preg_replace('/[^a-z0-9-]+/', '-', $requestedSlug);
+        $requestedSlug = trim($requestedSlug, '-');
+
         if ($request->filled('id')) {
             $pages = Pages::findOrFail($request->id);
             // Safety: if the row's lang doesn't match the form's lang, refuse
@@ -135,7 +140,24 @@ class PagesController extends Controller
             }
         } else {
             $pages = new Pages();
-            $pages->slug = $request->slug ?: $request->input('_slug');
+        }
+
+        // Slug change handling — disallow collision with another row in the
+        // same language. If the slug is being changed, redirect after save
+        // so the admin doesn't 404 on the old URL.
+        $oldSlug = $pages->slug ?? null;
+        if ($requestedSlug && $requestedSlug !== $oldSlug) {
+            $clash = Pages::where('slug', $requestedSlug)
+                ->where('lang', $lang)
+                ->where('id', '!=', $pages->id ?? 0)
+                ->exists();
+            if ($clash) {
+                return back()->with('error', 'Another page already uses the slug "' . $requestedSlug . '" in ' . strtoupper($lang) . '.');
+            }
+            $pages->slug = $requestedSlug;
+        } elseif (!$pages->slug) {
+            // New row, no slug typed — fall back to the URL parameter
+            $pages->slug = $request->input('_slug') ?: $requestedSlug;
         }
 
         $pages->lang             = $lang;
@@ -145,6 +167,13 @@ class PagesController extends Controller
         $pages->meta_title       = $request->meta_title;
         $pages->meta_description = $request->meta_description;
         $pages->save();
+
+        // If the slug changed, redirect to the editor under the NEW slug so
+        // the URL bar stays in sync; otherwise plain back().
+        if ($oldSlug && $pages->slug !== $oldSlug) {
+            return redirect('dashboard/pages/' . $pages->slug)
+                ->with('message', 'update');
+        }
 
         return back()->with('message', $request->filled('id') ? 'update' : 'add');
     }

@@ -1,6 +1,6 @@
 @extends('website.layouts.app')
 
-@section('title', 'Posts ')
+@section('title', __('site.nav_blog'))
 @section('content')
 <style>
 .bg-light {

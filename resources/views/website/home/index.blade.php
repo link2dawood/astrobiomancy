@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'Home ')
+@section('title', $homepage->meta_title ?? __('site.meta_title'))
 @section('content')
 <style>
 .offer-buttons {

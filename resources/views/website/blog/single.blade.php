@@ -1,6 +1,6 @@
 @extends('website.layouts.app')
 
-@section('title', 'Posts ')
+@section('title', $post->meta_title ?? $post->title)
 @section('page_meta')
 <meta name="keywords" content="{{$post->meta_keyword}}">
 <meta name="description" content="{{$post->description}}">

@@ -1,5 +1,5 @@
 @extends('website.layouts.app')
-@section('title', 'Home ')
+@section('title', __('site.contact_title'))
 
 @section('content')
    <header class="page-header-ui page-header-ui-dark bg-gradient-primary-to-secondary">
