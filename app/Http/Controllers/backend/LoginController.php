@@ -60,9 +60,13 @@ class LoginController extends Controller
 	*
 	* @return success message
 	*/
-	public function logout()
+	public function logout(Request $request)
 	{
 		Auth::logout();
+		// Fully invalidate the session + regenerate CSRF so the session
+		// cookie can't be replayed to bring the auth state back.
+		$request->session()->invalidate();
+		$request->session()->regenerateToken();
 		return redirect('login')->with('message', 'Logout Successfully.');
-	}		
+	}
 }

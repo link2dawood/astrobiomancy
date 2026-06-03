@@ -25,10 +25,16 @@ use Stripe;
 */
 class AccountController extends Controller
 {  
-	public function logout () 
+	public function logout (Request $request)
 	{
 		Auth::logout();
-		return redirect('user/login');
+		// Laravel's recommended logout flow: clear auth, invalidate the
+		// session entirely, and regenerate the CSRF token. Otherwise the
+		// session cookie can survive and re-surface auth in some edge
+		// cases (back button, cached middleware state, multi-tab).
+		$request->session()->invalidate();
+		$request->session()->regenerateToken();
+		return redirect(app()->getLocale() . '/user/login');
 	}
 	public function orders () 
 	{
