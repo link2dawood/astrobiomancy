@@ -39,6 +39,16 @@
                         {{session()->get('success')}}
                     </div>
                     @endif
+                    @if ($errors->any())
+                    <br>
+                    <div class="alert alert-danger">
+                        <ul style="margin:0; padding-left:1rem;">
+                            @foreach ($errors->all() as $e)
+                                <li>{{ $e }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                 </div>
                 <div class="col-md-6">
                     <br>
@@ -60,12 +70,58 @@
                     <input class="form-control py-4"  type="password" name="password" />
 
                 </div>
-                <div class="col-md-6">
-                    <br>
-                    <div class="g-recaptcha" data-sitekey="6LfM4nYqAAAAAPIWFdST6RQWSHIlqC8BeRliJcj3"></div>
+            </div>
 
+            <hr class="my-4">
+            <h5 class="text-dark mb-3">{{ __('site.address_card_title') }}</h5>
+
+            <div class="row gx-5 mb-4">
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_first_name') }} *</label>
+                    <input class="form-control py-4" type="text" name="first_name"
+                           value="{{ old('first_name') }}" required>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_last_name') }} *</label>
+                    <input class="form-control py-4" type="text" name="last_name"
+                           value="{{ old('last_name') }}" required>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_address') }} *</label>
+                    <input class="form-control py-4" type="text" name="address"
+                           value="{{ old('address') }}" required>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_address2') }}</label>
+                    <input class="form-control py-4" type="text" name="address2"
+                           value="{{ old('address2') }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_city') }} *</label>
+                    <input class="form-control py-4" type="text" name="city"
+                           value="{{ old('city') }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_zipcode') }} *</label>
+                    <input class="form-control py-4" type="text" name="zipcode"
+                           value="{{ old('zipcode') }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_state') }} *</label>
+                    <input class="form-control py-4" type="text" name="state"
+                           value="{{ old('state') }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="text-dark mb-2">{{ __('site.label_country') }} *</label>
+                    <input class="form-control py-4" type="text" name="country"
+                           value="{{ old('country') }}" required>
+                </div>
+            </div>
 
+            <div class="row gx-5 mb-4">
+                <div class="col-md-6">
+                    <div class="g-recaptcha" data-sitekey="6LfM4nYqAAAAAPIWFdST6RQWSHIlqC8BeRliJcj3"></div>
+                </div>
             </div>
             
             

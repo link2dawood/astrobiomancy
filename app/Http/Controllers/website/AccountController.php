@@ -36,12 +36,12 @@ class AccountController extends Controller
 		return view('website.account.orders', compact('orders'));
 	}
 
-	public function useraccount () 
+	public function useraccount ()
 	{
 		return view('website.account.useraccount');
 	}
 
-	public function accountupdate ( Request $request ) 
+	public function accountupdate ( Request $request )
 	{
 		$user = User::find(Auth::user()->id);
 		if (!isset($user->id)) {
@@ -53,6 +53,37 @@ class AccountController extends Controller
 		}
 		$user->save();
 		return back()->with('message', 'Account has been updated.');
+	}
+
+	public function address ()
+	{
+		return view('website.account.address', ['user' => Auth::user()]);
+	}
+
+	public function addresssave (Request $request)
+	{
+		$user = User::find(Auth::user()->id);
+		if (!isset($user->id)) {
+			abort(404);
+		}
+
+		$validated = $request->validate([
+			'first_name' => 'required|string|max:191',
+			'last_name'  => 'required|string|max:191',
+			'address'    => 'required|string|max:191',
+			'address2'   => 'nullable|string|max:191',
+			'city'       => 'required|string|max:191',
+			'zipcode'    => 'required|string|max:32',
+			'state'      => 'required|string|max:191',
+			'country'    => 'required|string|max:191',
+		]);
+
+		foreach ($validated as $field => $value) {
+			$user->{$field} = $value;
+		}
+		$user->save();
+
+		return back()->with('message', __('site.flash_address_saved'));
 	}
 
 	public function userorder ( $id ) {

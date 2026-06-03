@@ -88,6 +88,24 @@ return [
     'already_have_account' => 'Haben Sie bereits ein Konto?',
     'contact_title'     => 'Kontakt',
 
+    // Kontosidebar
+    'nav_profile'       => 'Profil',
+    'nav_address'       => 'Adresse',
+    'nav_orders'        => 'Bestellungen',
+
+    // Adressformular
+    'address_card_title' => 'Rechnungs- / Kontaktadresse',
+    'label_first_name'  => 'Vorname',
+    'label_last_name'   => 'Nachname',
+    'label_address'     => 'Straße und Hausnummer',
+    'label_address2'    => 'Adresszusatz',
+    'label_city'        => 'Stadt',
+    'label_zipcode'     => 'Postleitzahl',
+    'label_state'       => 'Bundesland / Region',
+    'label_country'     => 'Land',
+    'hint_address2'     => 'Wohnung, Stockwerk, Gebäude usw. (optional)',
+    'flash_address_saved' => 'Adresse gespeichert.',
+
     // Flash-Meldungen
     'flash_verified'         => 'Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.',
     'flash_verify_required'  => 'Ein Bestätigungslink wurde an Ihre E-Mail gesendet. Bitte bestätigen Sie zuerst Ihr Konto.',

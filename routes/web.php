@@ -56,6 +56,7 @@ Route::post('/postorder',                 ['uses' => 'website\WebsiteController@
 
 Route::group(['middleware' => ['role:User|Admin', 'auth']], function () {
     Route::post('/users/accountupdate',           ['uses' => 'website\AccountController@accountupdate']);
+    Route::post('/users/address',                 ['uses' => 'website\AccountController@addresssave']);
     Route::post('/users/ordersaveques',           ['uses' => 'website\AccountController@ordersaveques']);
     Route::post('/users/orders/uploadtempfile',   ['uses' => 'website\AccountController@uploadtempfile']);
 });
@@ -90,6 +91,8 @@ Route::group([
 
     Route::group(['middleware' => ['role:User|Admin', 'auth']], function () {
         Route::get('users/account', ['uses' => 'website\AccountController@useraccount']);
+        Route::get('users/address', ['uses' => 'website\AccountController@address']);
+        Route::post('users/address', ['uses' => 'website\AccountController@addresssave']);
         Route::get('users/orders', ['uses' => 'website\AccountController@orders']);
         Route::get('users/logout', ['uses' => 'website\AccountController@logout']);
         Route::post('users/accountupdate', ['uses' => 'website\AccountController@accountupdate']);

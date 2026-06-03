@@ -81,6 +81,14 @@ class UsersController extends Controller
 		if ($request->password != '') {
 			$user->password = bcrypt($request->password);
 		}
+
+		// Address block — all optional in admin (admins may need to clear fields).
+		foreach (['first_name','last_name','address','address2','city','zipcode','state','country'] as $f) {
+			if ($request->has($f)) {
+				$user->{$f} = $request->input($f);
+			}
+		}
+
 		$user->save();
 		return redirect('dashboard/users')->with('message', 'update');
 	}

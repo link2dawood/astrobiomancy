@@ -124,28 +124,50 @@ class WebsiteController extends Controller
 		
 	}
 	
-	public function createuser ( Request $request ) 
+	public function createuser ( Request $request )
 	{
 
 		if (isset($_POST['g-recaptcha-response']) && !empty($_POST['g-recaptcha-response'])) {
-			
+
 			if($this->verifyGoogleCaptcha($_POST['g-recaptcha-response'])){
 
+				// Validate the address block + core fields before creating
+				// the row. Returns to the form with errors on failure.
+				$validated = $request->validate([
+					'name'       => 'required|string|max:191',
+					'email'      => 'required|email|max:191',
+					'password'   => 'required|string|min:6',
+					'first_name' => 'required|string|max:191',
+					'last_name'  => 'required|string|max:191',
+					'address'    => 'required|string|max:191',
+					'address2'   => 'nullable|string|max:191',
+					'city'       => 'required|string|max:191',
+					'zipcode'    => 'required|string|max:32',
+					'state'      => 'required|string|max:191',
+					'country'    => 'required|string|max:191',
+				]);
+
 				$user = User::where('email', $request->email)->first();
-
-
 				if (isset($user->id)) {
-					return back()->with('error', __('site.flash_user_exists'));
+					return back()->with('error', __('site.flash_user_exists'))->withInput();
 				}
-				$random_number = rand(10000, 1000000000000000);
-				$random_number = md5($random_number);
+
+				$random_number = md5(rand(10000, 1000000000000000));
 
 				$user = new User();
-				$user->name = $request->name;
-				$user->email = $request->email;
+				$user->name          = $request->name;
+				$user->email         = $request->email;
 				$user->account_token = $random_number;
-				$user->is_verify = 0;
-				$user->password =bcrypt($request->password) ;
+				$user->is_verify     = 0;
+				$user->password      = bcrypt($request->password);
+				$user->first_name    = $request->first_name;
+				$user->last_name     = $request->last_name;
+				$user->address       = $request->address;
+				$user->address2      = $request->address2;
+				$user->city          = $request->city;
+				$user->zipcode       = $request->zipcode;
+				$user->state         = $request->state;
+				$user->country       = $request->country;
 				$user->save();
 				$user->assignRole(2);
 

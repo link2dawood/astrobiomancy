@@ -88,6 +88,24 @@ return [
     'already_have_account' => 'Already have an account?',
     'contact_title'     => 'Contact us',
 
+    // Account sidebar
+    'nav_profile'       => 'Profile',
+    'nav_address'       => 'Address',
+    'nav_orders'        => 'Orders',
+
+    // Address form
+    'address_card_title' => 'Billing / Contact Address',
+    'label_first_name'  => 'First Name',
+    'label_last_name'   => 'Last Name',
+    'label_address'     => 'Address',
+    'label_address2'    => 'Address 2',
+    'label_city'        => 'City',
+    'label_zipcode'     => 'Zip / Postal code',
+    'label_state'       => 'State / Province',
+    'label_country'     => 'Country',
+    'hint_address2'     => 'Apartment, suite, building, floor, etc. (optional)',
+    'flash_address_saved' => 'Address saved.',
+
     // Flash messages (controllers)
     'flash_verified'         => 'Your email address has been verified. You can now log in to continue.',
     'flash_verify_required'  => 'Verification link has been sent on your email. Please first verify your account.',
