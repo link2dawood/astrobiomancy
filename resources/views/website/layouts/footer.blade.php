@@ -36,6 +36,14 @@
                     $fLinks    = \App\Models\MenuItem::at('footer_links')->where('lang', $L)->orderBy('sort')->get();
                     $fServices = \App\Models\MenuItem::at('footer_services')->where('lang', $L)->orderBy('sort')->get();
                     $fLegal    = \App\Models\MenuItem::at('footer_legal')->where('lang', $L)->orderBy('sort')->get();
+
+                    // Render one menu item, honouring magic URLs (#cookie-settings opens consent modal).
+                    $renderItem = function($i) use ($localize) {
+                        if ($i->url === '#cookie-settings') {
+                            return '<a href="#" data-cc-open>' . e($i->label) . '</a>';
+                        }
+                        return '<a href="' . e($localize($i->url)) . '">' . e($i->label) . '</a>';
+                    };
                 @endphp
 
                 <div class="col-lg-4 col-md-6 mb-5 mb-lg-0">
@@ -43,7 +51,7 @@
                     <ul class="list-unstyled mb-0">
                         @if ($fLinks->isNotEmpty())
                             @foreach ($fLinks as $i)
-                                <li class="mb-2"><a href="{{ $localize($i->url) }}">{{ $i->label }}</a></li>
+                                <li class="mb-2">{!! $renderItem($i) !!}</li>
                             @endforeach
                         @else
                             <li class="mb-2"><a href="{{ url('/' . $L) }}">{{ __('site.nav_home') }}</a></li>
@@ -60,7 +68,7 @@
                     <ul class="list-unstyled mb-0">
                         @if ($fServices->isNotEmpty())
                             @foreach ($fServices as $i)
-                                <li class="mb-2"><a href="{{ $localize($i->url) }}">{{ $i->label }}</a></li>
+                                <li class="mb-2">{!! $renderItem($i) !!}</li>
                             @endforeach
                         @else
                             <li class="mb-2"><a href="{{ url($L . '/service/dietary-health-advice') }}">{{ __('site.svc_dietary') }}</a></li>
@@ -75,7 +83,7 @@
                     <ul class="list-unstyled mb-0">
                         @if ($fLegal->isNotEmpty())
                             @foreach ($fLegal as $i)
-                                <li class="mb-2"><a href="{{ $localize($i->url) }}">{{ $i->label }}</a></li>
+                                <li class="mb-2">{!! $renderItem($i) !!}</li>
                             @endforeach
                         @else
                             <li class="mb-2"><a href="{{ url($L . '/disclaimer') }}">{{ __('site.footer_disclaimer') }}</a></li>

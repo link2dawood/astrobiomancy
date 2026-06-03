@@ -97,25 +97,49 @@
                         @endphp
 
                         @if ($headerItems->isNotEmpty())
-                            {{-- DB-driven header items --}}
+                            {{-- DB-driven header items. Special URLs that render as dropdowns / conditional links:
+                                   #services  -> Services dropdown (sourced from "Header — Services dropdown")
+                                   #account   -> Account dropdown (only when logged in)
+                                   #login     -> Login link (only when logged out)
+                                 Anything else is rendered as a normal link, locale-prefixed if relative. --}}
                             @foreach ($headerItems as $i)
-                                <li class="nav-item"><a class="nav-link" href="{{ $localize($i->url) }}">{{ $i->label }}</a></li>
+                                @if ($i->url === '#services')
+                                    @if ($serviceItems->isNotEmpty())
+                                        <li class="nav-item dropdown no-caret">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                                {{ $i->label }}
+                                                <i class="fas fa-chevron-right dropdown-arrow"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end animated--fade-in-up">
+                                                @foreach ($serviceItems as $j)
+                                                    <a class="dropdown-item py-3" href="{{ $localize($j->url) }}">{{ $j->label }}</a>
+                                                    @if (!$loop->last)<div class="dropdown-divider m-0"></div>@endif
+                                                @endforeach
+                                            </div>
+                                        </li>
+                                    @endif
+                                @elseif ($i->url === '#account')
+                                    @if (isset(Auth::user()->id))
+                                        <li class="nav-item dropdown no-caret">
+                                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                                {{ $i->label }}
+                                                <i class="fas fa-chevron-right dropdown-arrow"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end animated--fade-in-up">
+                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/account') }}">{{ __('site.nav_account') }}</a>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/logout') }}">{{ __('site.nav_logout') }}</a>
+                                            </div>
+                                        </li>
+                                    @endif
+                                @elseif ($i->url === '#login')
+                                    @if (!isset(Auth::user()->id))
+                                        <li class="nav-item"><a class="nav-link" href="{{ url($L . '/user/login') }}">{{ $i->label }}</a></li>
+                                    @endif
+                                @else
+                                    <li class="nav-item"><a class="nav-link" href="{{ $localize($i->url) }}">{{ $i->label }}</a></li>
+                                @endif
                             @endforeach
-
-                            @if ($serviceItems->isNotEmpty())
-                                <li class="nav-item dropdown no-caret">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        {{ __('site.nav_services') }}
-                                        <i class="fas fa-chevron-right dropdown-arrow"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-end animated--fade-in-up">
-                                        @foreach ($serviceItems as $j)
-                                            <a class="dropdown-item py-3" href="{{ $localize($j->url) }}">{{ $j->label }}</a>
-                                            @if (!$loop->last)<div class="dropdown-divider m-0"></div>@endif
-                                        @endforeach
-                                    </div>
-                                </li>
-                            @endif
                         @else
                             {{-- Hardcoded defaults (used until an editor populates menu_items) --}}
                             <li class="nav-item"><a class="nav-link" href="{{ url('/' . $L) }}">{{ __('site.nav_home') }}</a></li>
@@ -143,22 +167,22 @@
                             <li class="nav-item"><a class="nav-link" href="{{ url($L . '/page/about-the-book') }}">{{ __('site.nav_book') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url($L . '/testimonials') }}">{{ __('site.nav_testimonials') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url($L . '/about-us') }}">{{ __('site.nav_about') }}</a></li>
-                        @endif
 
-                        @if(isset(Auth::user()->id))
-                            <li class="nav-item dropdown no-caret">
-                                <a class="nav-link dropdown-toggle" id="account" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{ __('site.nav_account') }}
-                                    <i class="fas fa-chevron-right dropdown-arrow"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end animated--fade-in-up" aria-labelledby="account">
-                                    <a class="dropdown-item py-3" href="{{ url(app()->getLocale() . '/users/account') }}">{{ __('site.nav_account') }}</a>
-                                    <div class="dropdown-divider m-0"></div>
-                                    <a class="dropdown-item py-3" href="{{ url(app()->getLocale() . '/users/logout') }}">{{ __('site.nav_logout') }}</a>
-                                </div>
-                            </li>
-                        @else
-                            <li class="nav-item"><a class="nav-link" href="{{ url(app()->getLocale() . '/user/login') }}">{{ __('site.nav_login') }}</a></li>
+                            @if(isset(Auth::user()->id))
+                                <li class="nav-item dropdown no-caret">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        {{ __('site.nav_account') }}
+                                        <i class="fas fa-chevron-right dropdown-arrow"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end animated--fade-in-up">
+                                        <a class="dropdown-item py-3" href="{{ url($L . '/users/account') }}">{{ __('site.nav_account') }}</a>
+                                        <div class="dropdown-divider m-0"></div>
+                                        <a class="dropdown-item py-3" href="{{ url($L . '/users/logout') }}">{{ __('site.nav_logout') }}</a>
+                                    </div>
+                                </li>
+                            @else
+                                <li class="nav-item"><a class="nav-link" href="{{ url($L . '/user/login') }}">{{ __('site.nav_login') }}</a></li>
+                            @endif
                         @endif
 
                         {{-- Persistent EN / DE switcher --}}
