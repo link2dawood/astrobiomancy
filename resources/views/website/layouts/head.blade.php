@@ -126,11 +126,19 @@
                                                 <i class="fas fa-chevron-right dropdown-arrow"></i>
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-end animated--fade-in-up">
-                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/account') }}">{{ __('site.nav_account') }}</a>
+                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/account') }}">{{ __('site.nav_profile') }}</a>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/address') }}">{{ __('site.nav_address') }}</a>
+                                                <div class="dropdown-divider m-0"></div>
+                                                <a class="dropdown-item py-3" href="{{ url($L . '/users/orders') }}">{{ __('site.nav_orders') }}</a>
                                                 <div class="dropdown-divider m-0"></div>
                                                 <a class="dropdown-item py-3" href="{{ url($L . '/users/logout') }}">{{ __('site.nav_logout') }}</a>
                                             </div>
                                         </li>
+                                    @else
+                                        {{-- Logged-out fallback: the same nav slot becomes a plain link to login,
+                                             keeping the position consistent so the visitor never sees the item disappear. --}}
+                                        <li class="nav-item"><a class="nav-link" href="{{ url($L . '/user/login') }}">{{ $i->label }}</a></li>
                                     @endif
                                 @elseif ($i->url === '#login')
                                     @if (!isset(Auth::user()->id))
