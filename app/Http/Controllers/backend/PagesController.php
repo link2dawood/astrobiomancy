@@ -107,6 +107,72 @@ class PagesController extends Controller
         }
     }
 
+    /**
+     * List every Pages-collection row, grouped by slug + language so the
+     * editor can see all custom pages at a glance and duplicate any of them.
+     */
+    public function pagesIndex()
+    {
+        $pages = Pages::orderBy('slug')->orderBy('lang')->get()->groupBy('slug');
+        return view('backend.pages.list', ['pageGroups' => $pages]);
+    }
+
+    public function newPage()
+    {
+        return view('backend.pages.new');
+    }
+
+    public function createPage(Request $request)
+    {
+        $request->validate([
+            'slug'  => 'required|string|max:191',
+            'title' => 'required|string|max:191',
+        ]);
+
+        $slug = strtolower(trim($request->slug));
+        $slug = preg_replace('/[^a-z0-9-]+/', '-', $slug);
+        $slug = trim($slug, '-');
+
+        if (Pages::where('slug', $slug)->exists()) {
+            return back()->with('error', 'A page with slug "' . $slug . '" already exists.')->withInput();
+        }
+
+        // Seed an EN row; editors can add a DE counterpart later via the editor.
+        $p = new Pages();
+        $p->slug         = $slug;
+        $p->lang         = 'en';
+        $p->main_heading = $request->title;
+        $p->save();
+
+        return redirect('dashboard/pages/' . $slug)->with('message', 'add');
+    }
+
+    /**
+     * Duplicate every language row of a page into a new slug. Editor lands
+     * on the new page's editor with all content pre-filled.
+     */
+    public function duplicate($slug)
+    {
+        $sourceRows = Pages::where('slug', $slug)->get();
+        if ($sourceRows->isEmpty()) {
+            return back()->with('error', 'Source page not found.');
+        }
+
+        $newSlug = $slug . '-copy';
+        $i = 2;
+        while (Pages::where('slug', $newSlug)->exists()) {
+            $newSlug = $slug . '-copy-' . $i++;
+        }
+
+        foreach ($sourceRows as $src) {
+            $copy = $src->replicate();
+            $copy->slug = $newSlug;
+            $copy->save();
+        }
+
+        return redirect('dashboard/pages/' . $newSlug)->with('message', 'add');
+    }
+
     public function page($slug)
     {
         $pages = [];

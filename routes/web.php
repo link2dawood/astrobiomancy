@@ -143,6 +143,14 @@ Route::group(['middleware' => ['role:Admin', 'auth']], function () {
     Route::post('dashboard/pages/privacypolicy_save', ['uses' => 'backend\PagesController@privacypolicy_save']);
 
     Route::post('dashboard/pages/update', ['uses' => 'backend\PagesController@update']);
+
+    // Pages collection: list, create, duplicate. These must come BEFORE
+    // dashboard/pages/{slug} so the wildcard doesn't swallow them.
+    Route::get('dashboard/pages', ['uses' => 'backend\PagesController@pagesIndex']);
+    Route::get('dashboard/pages-new', ['uses' => 'backend\PagesController@newPage']);
+    Route::post('dashboard/pages-create', ['uses' => 'backend\PagesController@createPage']);
+    Route::get('dashboard/pages-duplicate/{slug}', ['uses' => 'backend\PagesController@duplicate']);
+
     Route::get('dashboard/pages/{slug}', ['uses' => 'backend\PagesController@page']);
 
     Route::get('/dashboard/media', ['uses' => 'backend\MediaController@list']);

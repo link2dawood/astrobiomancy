@@ -47,6 +47,7 @@
          <i class="md md-pages "></i>&nbsp;Pages
          </a>
             <ul id="pages" class="collapse">
+                <li> <a href="{{url('dashboard/pages')}}" ><span><strong>All pages / New</strong></span></a></li>
                 <li> <a href="{{url('dashboard/pages/home')}}" ><span>Home</span></a></li>
                 <li> <a href="{{url('dashboard/pages/about')}}" ><span>About Us </span></a></li>
                 <li> <a href="{{url('dashboard/pages/about-the-book')}}" ><span>About The Book</span></a></li>
