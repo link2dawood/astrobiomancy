@@ -121,7 +121,6 @@
 </div>
 </div>
 </section>
-<hr class="m-0" />
 
 @if (!empty($testimonials) && $testimonials->isNotEmpty())
 <section class="py-10" style="background:#feefd2;">

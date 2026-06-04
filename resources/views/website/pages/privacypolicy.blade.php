@@ -29,7 +29,6 @@
         </div>
         <div class="svg-border-rounded text-dark">
         <!-- Rounded SVG Border-->
-        <hr class="m-0">
     </div>
 </section>
 @endsection
