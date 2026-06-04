@@ -375,7 +375,8 @@ class WebsiteController extends Controller
 			}
 		}
 		$settings  = Settings::find(1);
-		Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+		// Use config() not env() — env() returns null when config:cache has run.
+		Stripe\Stripe::setApiKey(config('services.stripe.secret'));
 		$stripe_id = '';
 		$erro_message = '';
 		if ($request->stripe_token!='' && $request->stripe_token!='paypal') {

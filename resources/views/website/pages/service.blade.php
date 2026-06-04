@@ -243,7 +243,13 @@
 
 
 
-<script src="https://www.paypal.com/sdk/js?client-id=AbOQbgyzG0UMn4d5V18hWaebWqxWWaD9Nd5OCKyatgOvc-Uo0rpQcIM3jT9dk-npTeP2HMUKq5yCa5Mn&currency=EUR" data-namespace="xswpvc_paypal_sdk" ></script>
+@php
+    $paypalClient   = config('services.paypal.client_id');
+    $paypalCurrency = config('services.paypal.currency') ?: 'EUR';
+@endphp
+@if ($paypalClient)
+    <script src="https://www.paypal.com/sdk/js?client-id={{ $paypalClient }}&currency={{ $paypalCurrency }}" data-namespace="xswpvc_paypal_sdk"></script>
+@endif
 
 <script>
 
@@ -394,7 +400,7 @@
     });
 
 var stripe = 
-Stripe('{{env("STRIPE_PUBLISHABLE")}}');
+Stripe('{{ config("services.stripe.publishable") }}');
     // Create an instance of Elements.
     var elements = stripe.elements();
     // Custom styling can be passed to options when creating an Element.
