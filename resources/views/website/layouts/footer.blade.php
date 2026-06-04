@@ -59,7 +59,7 @@
                                 <li class="mb-2"><a href="{{ url($L . '/blog') }}">{{ __('site.nav_blog') }}</a></li>
                             @endif
                             <li class="mb-2"><a href="{{ url($L . '/testimonials') }}">{{ __('site.nav_testimonials') }}</a></li>
-                            <li><a href="{{ url($L . '/about-us') }}">{{ __('site.nav_about') }}</a></li>
+                            <li><a href="{{ url($L . '/' . ($singletonSlugs['about_us'] ?? 'about-us')) }}">{{ __('site.nav_about') }}</a></li>
                         @endif
                     </ul>
                 </div>
@@ -86,8 +86,8 @@
                                 <li class="mb-2">{!! $renderItem($i) !!}</li>
                             @endforeach
                         @else
-                            <li class="mb-2"><a href="{{ url($L . '/disclaimer') }}">{{ __('site.footer_disclaimer') }}</a></li>
-                            <li class="mb-2"><a href="{{ url($L . '/privacy-policy') }}">{{ __('site.footer_privacy') }}</a></li>
+                            <li class="mb-2"><a href="{{ url($L . '/' . ($singletonSlugs['disclaimer'] ?? 'disclaimer')) }}">{{ __('site.footer_disclaimer') }}</a></li>
+                            <li class="mb-2"><a href="{{ url($L . '/' . ($singletonSlugs['privacypolicy'] ?? 'privacy-policy')) }}">{{ __('site.footer_privacy') }}</a></li>
                             <li class="mb-2"><a href="{{ url($L . '/page/terms-conditions') }}">{{ __('site.footer_terms') }}</a></li>
                             <li class="mb-2"><a href="{{ url($L . '/page/cookie-policy') }}">{{ __('site.footer_cookies') }}</a></li>
                             <li class="mb-2"><a href="#" data-cc-open>{{ __('site.footer_cookie_settings') }}</a></li>

@@ -18,6 +18,7 @@
                                 'rows'       => $rows,
                                 'action_url' => url('/dashboard/pages/disclaimer_save'),
                                 'title'      => 'Disclaimer',
+                                'show_slug'  => true,
                             ])
                         </div>
                     </div>

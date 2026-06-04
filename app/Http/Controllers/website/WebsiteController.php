@@ -204,6 +204,31 @@ class WebsiteController extends Controller
 		return view('website.pages.privacypolicy', compact('privacypolicy'));
 	}
 
+	/**
+	 * Catch-all resolver for renamed singleton URLs. When admin renames a
+	 * page's slug (e.g. about-us -> about-me), the slug column on the
+	 * Aboutus / Privacypolicy / Disclaimer row holds the new value, and
+	 * this method dispatches /{locale}/{slug} to the right view.
+	 */
+	public function singletonBySlug($slug)
+	{
+		$loc = app()->getLocale();
+
+		$row = Aboutus::where('lang', $loc)->where('slug', $slug)->first()
+			?: Aboutus::where('lang', 'en')->where('slug', $slug)->first();
+		if ($row) return view('website.pages.aboutus', ['aboutus' => $row]);
+
+		$row = Privacypolicy::where('lang', $loc)->where('slug', $slug)->first()
+			?: Privacypolicy::where('lang', 'en')->where('slug', $slug)->first();
+		if ($row) return view('website.pages.privacypolicy', ['privacypolicy' => $row]);
+
+		$row = Disclaimer::where('lang', $loc)->where('slug', $slug)->first()
+			?: Disclaimer::where('lang', 'en')->where('slug', $slug)->first();
+		if ($row) return view('website.pages.disclaimer', ['disclaimer' => $row]);
+
+		abort(404);
+	}
+
 	public function page ( $slug )
 	{
 		$loc = app()->getLocale();

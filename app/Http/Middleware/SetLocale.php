@@ -39,6 +39,15 @@ class SetLocale
         view()->share('locale', $locale);
         view()->share('supportedLocales', self::SUPPORTED);
 
+        // Resolve the active slug for each singleton page so views can link
+        // to the correct (renameable) URL without hardcoding. Falls back to
+        // the original slug if the row hasn't been migrated yet.
+        view()->share('singletonSlugs', [
+            'about_us'      => optional(\App\Models\Aboutus::where('lang', $locale)->first())->slug ?: 'about-us',
+            'privacypolicy' => optional(\App\Models\Privacypolicy::where('lang', $locale)->first())->slug ?: 'privacy-policy',
+            'disclaimer'    => optional(\App\Models\Disclaimer::where('lang', $locale)->first())->slug ?: 'disclaimer',
+        ]);
+
         // Drop the {locale} route parameter so controller signatures stay clean
         // and url generation can default it from app locale.
         if ($request->route() && $request->route()->hasParameter('locale')) {

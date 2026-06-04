@@ -93,7 +93,14 @@ class PagesController extends Controller
             }
             $row = $modelClass::firstOrNew(['lang' => $loc]);
             foreach ($fields as $f) {
-                $row->{$f} = $request->input($f . '.' . $loc);
+                $value = $request->input($f . '.' . $loc);
+                if ($f === 'slug' && $value) {
+                    // Sanitize slug: lowercase, only a-z 0-9 dash.
+                    $value = strtolower(trim($value));
+                    $value = preg_replace('/[^a-z0-9-]+/', '-', $value);
+                    $value = trim($value, '-');
+                }
+                $row->{$f} = $value;
             }
             $row->lang = $loc;
             $row->save();
@@ -188,7 +195,7 @@ class PagesController extends Controller
     {
         $this->saveByLocale(Aboutus::class, $request, [
             'main_heading', 'second_heading', 'description',
-            'meta_title', 'meta_description',
+            'meta_title', 'meta_description', 'slug',
         ]);
         return back()->with('message', 'add');
     }
@@ -203,7 +210,7 @@ class PagesController extends Controller
     {
         $this->saveByLocale(Disclaimer::class, $request, [
             'main_heading', 'second_heading', 'description',
-            'meta_title', 'meta_description',
+            'meta_title', 'meta_description', 'slug',
         ]);
         return back()->with('message', 'add');
     }
@@ -218,7 +225,7 @@ class PagesController extends Controller
     {
         $this->saveByLocale(Privacypolicy::class, $request, [
             'main_heading', 'second_heading', 'description',
-            'meta_title', 'meta_description',
+            'meta_title', 'meta_description', 'slug',
         ]);
         return back()->with('message', 'add');
     }

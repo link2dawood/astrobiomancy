@@ -18,6 +18,7 @@
                                 'rows'       => $rows,
                                 'action_url' => url('/dashboard/pages/privacypolicy_save'),
                                 'title'      => 'Privacy Policy',
+                                'show_slug'  => true,
                             ])
                         </div>
                     </div>

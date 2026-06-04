@@ -78,11 +78,8 @@ Route::group([
     Route::get('account-verfiy/{verifycode}', ['uses' => 'website\WebsiteController@verifycode']);
 
     Route::get('/contact-us', ['uses' => 'website\WebsiteController@contactus']);
-    Route::get('/about-us', ['uses' => 'website\WebsiteController@aboutus']);
-    Route::get('/privacy-policy', ['uses' => 'website\WebsiteController@privacypolicy']);
     Route::get('/service/{slug}', ['uses' => 'website\WebsiteController@service']);
     Route::get('/page/{slug}', ['uses' => 'website\WebsiteController@page']);
-    Route::get('/disclaimer', ['uses' => 'website\WebsiteController@disclaimer']);
     Route::get('/blog', ['uses' => 'website\WebsiteController@blog']);
     Route::get('post/{slug}', ['uses' => 'website\WebsiteController@singlePost']);
     Route::post('post-comment', ['uses' => 'website\WebsiteController@postcomment']);
@@ -100,6 +97,12 @@ Route::group([
         Route::post('users/ordersaveques', ['uses' => 'website\AccountController@ordersaveques']);
         Route::post('users/orders/uploadtempfile', ['uses' => 'website\AccountController@uploadtempfile']);
     });
+
+    // Catch-all for renameable singleton URLs (about/disclaimer/privacy/etc.).
+    // Comes last so blog/service/page/testimonials/users/* match first.
+    // Restricted to a single segment so nested paths fall through to a real 404.
+    Route::get('/{slug}', ['uses' => 'website\WebsiteController@singletonBySlug'])
+        ->where('slug', '[a-z0-9\-]+');
 });
 
 /*

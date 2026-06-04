@@ -174,7 +174,7 @@
 
                             <li class="nav-item"><a class="nav-link" href="{{ url($L . '/page/about-the-book') }}">{{ __('site.nav_book') }}</a></li>
                             <li class="nav-item"><a class="nav-link" href="{{ url($L . '/testimonials') }}">{{ __('site.nav_testimonials') }}</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url($L . '/about-us') }}">{{ __('site.nav_about') }}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url($L . '/' . ($singletonSlugs['about_us'] ?? 'about-us')) }}">{{ __('site.nav_about') }}</a></li>
 
                             @if(isset(Auth::user()->id))
                                 <li class="nav-item dropdown no-caret">

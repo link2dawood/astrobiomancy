@@ -38,6 +38,22 @@
                     <input type="hidden" name="_save_lang" value="{{ $code }}">
 
                     <div class="row">
+                        @if (!empty($show_slug))
+                        <div class="col-md-12" style="margin-bottom:12px;">
+                            <label class="control-label">URL slug ({{ strtoupper($code) }})</label>
+                            <div class="input-group">
+                                <span class="input-group-text text-muted">/{{ $code }}/</span>
+                                <input type="text" name="slug[{{ $code }}]" class="form-control"
+                                       value="{{ $row->slug ?? '' }}"
+                                       pattern="[a-z0-9\-]+"
+                                       placeholder="e.g. about-me">
+                            </div>
+                            <small class="text-muted">
+                                Lowercase letters, numbers and dashes only.
+                                Changing this breaks existing links — also update any menu items in the Menus admin.
+                            </small>
+                        </div>
+                        @endif
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label">Main Heading ({{ strtoupper($code) }})</label>

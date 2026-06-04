@@ -18,6 +18,7 @@
                                 'rows'       => $rows,
                                 'action_url' => url('/dashboard/pages/about_save'),
                                 'title'      => 'About Us',
+                                'show_slug'  => true,
                             ])
                         </div>
                     </div>
