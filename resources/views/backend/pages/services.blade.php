@@ -132,10 +132,11 @@
                                                                 <div class="col-md-12" style="margin-top:10px;">
                                                                     <label class="control-label">Customer question page</label>
                                                                     <small class="text-muted d-block" style="margin-bottom:6px;">
-                                                                        Email body sent to the buyer after purchase. HTML allowed (e.g. <code>&lt;p&gt;</code>, <code>&lt;br&gt;</code>).
+                                                                        Email body sent to the buyer after purchase. Use the toolbar to format — Bold, Italic, lists, links.
                                                                     </small>
-                                                                    <textarea name="customer_ask_question_page[{{ $code }}][]" class="form-control"
-                                                                              rows="6" style="font-family: inherit;">{{ $pkg['customer_ask_question_page'] ?? '' }}</textarea>
+                                                                    <textarea name="customer_ask_question_page[{{ $code }}][]"
+                                                                              class="form-control tinymce-cqp-{{ $code }}"
+                                                                              rows="6">{{ $pkg['customer_ask_question_page'] ?? '' }}</textarea>
                                                                 </div>
                                                                 <div class="col-md-12" style="margin-top:10px; text-align:right;">
                                                                     <button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="{{ $code }}" data-key="{{ $key }}">Remove this package</button>
@@ -171,15 +172,28 @@
 <script charset="utf-8" src="{{url('public/asserts/js/app.min.js')}}"></script>
 <script src="https://cdn.tiny.cloud/1/i1klei5i485h8ijgmj8q78rbugybwoq5i98egx3u3ofngezi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-    if (typeof tinymce !== 'undefined') {
+    function initServiceEditors() {
+        if (typeof tinymce === 'undefined') return;
         ['en', 'de'].forEach(function (c) {
+            // Service description (large editor)
             tinymce.init({
-                selector: 'textarea.tinymce-svc-' + c,
+                selector: 'textarea.tinymce-svc-' + c + ':not(.tinymce-loaded)',
                 plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
                 toolbar: 'undo redo | blocks | bold italic underline | link image media | numlist bullist | removeformat',
+                init_instance_callback: function (ed) { ed.getElement().classList.add('tinymce-loaded'); }
+            });
+            // Customer question page (compact toolbar, no media/image)
+            tinymce.init({
+                selector: 'textarea.tinymce-cqp-' + c + ':not(.tinymce-loaded)',
+                menubar: false,
+                height: 220,
+                plugins: 'autolink link lists',
+                toolbar: 'undo redo | bold italic underline | bullist numlist | link | removeformat',
+                init_instance_callback: function (ed) { ed.getElement().classList.add('tinymce-loaded'); }
             });
         });
     }
+    initServiceEditors();
 
     document.addEventListener('click', function (e) {
         var addBtn = e.target.closest('.add-pkg');
@@ -203,13 +217,15 @@
                       '<input type="text" name="package_id[' + lang + '][]" class="form-control"></div>' +
                     '<div class="col-md-12" style="margin-top:10px;">' +
                       '<label class="control-label">Customer question page</label>' +
-                      '<small class="text-muted d-block" style="margin-bottom:6px;">Email body sent to the buyer after purchase. HTML allowed.</small>' +
-                      '<textarea name="customer_ask_question_page[' + lang + '][]" class="form-control" rows="6" style="font-family: inherit;"></textarea></div>' +
+                      '<small class="text-muted d-block" style="margin-bottom:6px;">Email body sent to the buyer after purchase. Use the toolbar to format.</small>' +
+                      '<textarea name="customer_ask_question_page[' + lang + '][]" class="form-control tinymce-cqp-' + lang + '" rows="6"></textarea></div>' +
                     '<div class="col-md-12" style="margin-top:10px; text-align:right;">' +
                       '<button type="button" class="btn btn-sm btn-danger pkg-remove" data-lang="' + lang + '" data-key="' + i + '">Remove this package</button></div>' +
                   '</div>' +
                 '</div>';
             document.querySelector('.pkg-list-' + lang).insertAdjacentHTML('beforeend', html);
+            // Activate TinyMCE on the textarea we just inserted.
+            initServiceEditors();
             return;
         }
         var rmBtn = e.target.closest('.pkg-remove');
