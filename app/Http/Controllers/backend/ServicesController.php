@@ -25,9 +25,29 @@ class ServicesController extends Controller
 
     public function save(Request $request)
     {
-        $slug = $request->input('slug');
-        if (!$slug) {
+        $oldSlug = $request->input('slug');
+        if (!$oldSlug) {
             return back()->with('error', 'Missing service slug.');
+        }
+
+        // Optional new slug from the editor. Sanitize lowercase + dashes.
+        $newSlug = $request->input('new_slug');
+        if ($newSlug) {
+            $newSlug = strtolower(trim($newSlug));
+            $newSlug = preg_replace('/[^a-z0-9-]+/', '-', $newSlug);
+            $newSlug = trim($newSlug, '-');
+        }
+        // If new_slug differs and isn't taken by another (slug, lang) we'll
+        // rename every row of this service to the new slug.
+        if ($newSlug && $newSlug !== $oldSlug) {
+            $clash = Services::where('slug', $newSlug)->exists();
+            if ($clash) {
+                return back()->with('error', 'Another service already uses the slug "' . $newSlug . '".');
+            }
+            Services::where('slug', $oldSlug)->update(['slug' => $newSlug]);
+            $slug = $newSlug;
+        } else {
+            $slug = $oldSlug;
         }
 
         foreach (SetLocale::SUPPORTED as $loc) {
@@ -64,6 +84,11 @@ class ServicesController extends Controller
             $row->save();
         }
 
+        // If slug was renamed, redirect to the editor under the new slug so
+        // the URL bar reflects the change.
+        if ($slug !== $oldSlug) {
+            return redirect('dashboard/services/' . $slug)->with('message', 'update');
+        }
         return back()->with('message', 'add');
     }
 }

@@ -21,6 +21,30 @@
                             <fieldset>
                                 <legend>Service: <code>{{ $slug }}</code></legend>
 
+                                {{-- Shared slug editor — applies to all language rows of this service.
+                                     Renaming sends every row to the new URL and the admin to the new editor URL. --}}
+                                <div class="row" style="margin-bottom: 18px;">
+                                    <div class="col-md-12">
+                                        <label class="control-label">URL slug</label>
+                                        <form action="{{ url('dashboard/services/save') }}" method="POST" style="display: contents;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="slug" value="{{ $slug }}">
+                                            <div class="input-group">
+                                                <span class="input-group-text text-muted">/{locale}/service/</span>
+                                                <input type="text" name="new_slug" class="form-control"
+                                                       value="{{ $slug }}"
+                                                       pattern="[a-z0-9\-]+"
+                                                       placeholder="e.g. energy-work">
+                                                <button type="submit" class="btn btn-sm btn-secondary">Rename URL</button>
+                                            </div>
+                                            <small class="text-muted">
+                                                Lowercase letters, numbers and dashes only.
+                                                Renaming applies to both EN and DE rows at once. Update any menu items in the Menus admin afterwards.
+                                            </small>
+                                        </form>
+                                    </div>
+                                </div>
+
                                 <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 16px;">
                                     @foreach (['en' => 'English', 'de' => 'Deutsch'] as $code => $label)
                                         <li class="nav-item">

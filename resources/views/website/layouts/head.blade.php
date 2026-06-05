@@ -42,6 +42,14 @@
         .btn-teal { background: #c9cb47 !important; opacity: 1; border: unset; color:#5e000b; }
         .btn-teal:hover { background: #60ff00; border: unset; color:#5e000b; }
 
+        /* Kill the 1px orange hairline that the wave SVG leaves between the hero
+           and the next section. The SVG sits at the bottom of the hero with
+           position:absolute, but inline-element baseline alignment + subpixel
+           rendering leak a thin strip of the hero background. display:block
+           drops the baseline space; the negative margin-bottom overlaps the
+           edge by one pixel so any remaining gap is covered. */
+        .svg-border-rounded svg { display: block; margin-bottom: -1px; }
+
         /* Language switcher */
         .lang-switch { display: inline-flex; gap: .25rem; align-items: center; margin-left: 1rem; }
         .lang-switch a {
