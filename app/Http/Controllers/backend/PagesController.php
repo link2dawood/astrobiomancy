@@ -113,8 +113,52 @@ class PagesController extends Controller
      */
     public function pagesIndex()
     {
-        $pages = Pages::orderBy('slug')->orderBy('lang')->get()->groupBy('slug');
-        return view('backend.pages.list', ['pageGroups' => $pages]);
+        // Group Pages rows by translation_of (or self id if it's an original)
+        // so EN and DE translations of the same page appear in one row even
+        // after the editor renames slugs per language.
+        $allPages = Pages::orderBy('id')->get();
+        $pageGroups = [];
+        foreach ($allPages as $p) {
+            $key = $p->translation_of ?: $p->id;
+            $pageGroups[$key][] = $p;
+        }
+
+        // Services: one card per slug, grouping rows by slug.
+        $services = \App\Models\Services::orderBy('slug')->orderBy('lang')->get()->groupBy('slug');
+
+        return view('backend.pages.list', [
+            'pageGroups' => $pageGroups,
+            'services'   => $services,
+        ]);
+    }
+
+    /**
+     * Delete every language row that belongs to a given Pages slug.
+     */
+    public function deletePage($slug)
+    {
+        $rows = Pages::where('slug', $slug)->get();
+        if ($rows->isEmpty()) {
+            return back()->with('error', 'No page found with slug "' . $slug . '".');
+        }
+        foreach ($rows as $r) {
+            $r->delete();
+        }
+        return redirect('dashboard/pages')->with('message', 'deleted');
+    }
+
+    /**
+     * Delete a single Pages row by id (used when the user wants to remove
+     * just one language version of a page without deleting the other).
+     */
+    public function deletePageRow($id)
+    {
+        $row = Pages::find($id);
+        if (!$row) {
+            return back()->with('error', 'Page row not found.');
+        }
+        $row->delete();
+        return redirect('dashboard/pages')->with('message', 'deleted');
     }
 
     public function newPage()

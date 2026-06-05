@@ -3,13 +3,18 @@
 @section('meta_description', __('site.testimonials_meta'))
 @section('content')
 
+@php
+    $L = app()->getLocale();
+    $hero = \App\Models\Pages::where('slug', 'testimonials-hero')->where('lang', $L)->first()
+         ?: \App\Models\Pages::where('slug', 'testimonials-hero')->where('lang', 'en')->first();
+@endphp
 <header class="page-header-ui page-header-ui-dark bg-gradient-primary-to-secondary" style="background: #ff9536 !important;">
     <div class="page-header-ui-content pt-10">
         <div class="container px-5 text-center">
             <div class="row gx-5 justify-content-center">
                 <div class="col-lg-8">
-                    <h1 class="page-header-ui-title mb-3">{{ __('site.testimonials_title') }}</h1>
-                    <p class="page-header-ui-text">{{ __('site.testimonials_subtitle') }}</p>
+                    <h1 class="page-header-ui-title mb-3">{{ $hero->main_heading ?? __('site.testimonials_title') }}</h1>
+                    <p class="page-header-ui-text">{{ $hero->second_heading ?? __('site.testimonials_subtitle') }}</p>
                 </div>
             </div>
         </div>

@@ -23,6 +23,45 @@ class ServicesController extends Controller
         return view('backend.pages.services', ['rows' => $rows, 'slug' => $slug]);
     }
 
+    /**
+     * Clone every (slug, lang) row of an existing service into a fresh slug
+     * so the editor can start from a working copy. Auto-appends "-copy",
+     * "-copy-2", etc. until the new slug is free.
+     */
+    public function duplicate($slug)
+    {
+        $source = Services::where('slug', $slug)->get();
+        if ($source->isEmpty()) {
+            return back()->with('error', 'Source service not found.');
+        }
+
+        $newSlug = $slug . '-copy';
+        $i = 2;
+        while (Services::where('slug', $newSlug)->exists()) {
+            $newSlug = $slug . '-copy-' . $i++;
+        }
+
+        foreach ($source as $src) {
+            $copy = $src->replicate();
+            $copy->slug = $newSlug;
+            $copy->save();
+        }
+
+        return redirect('dashboard/services/' . $newSlug)->with('message', 'add');
+    }
+
+    public function delete($slug)
+    {
+        $rows = Services::where('slug', $slug)->get();
+        if ($rows->isEmpty()) {
+            return back()->with('error', 'Service not found.');
+        }
+        foreach ($rows as $r) {
+            $r->delete();
+        }
+        return redirect('dashboard/pages')->with('message', 'deleted');
+    }
+
     public function save(Request $request)
     {
         $oldSlug = $request->input('slug');

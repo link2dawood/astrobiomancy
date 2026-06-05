@@ -150,6 +150,11 @@ Route::group(['middleware' => ['role:Admin', 'auth']], function () {
     Route::get('dashboard/pages-new', ['uses' => 'backend\PagesController@newPage']);
     Route::post('dashboard/pages-create', ['uses' => 'backend\PagesController@createPage']);
     Route::get('dashboard/pages-duplicate/{slug}', ['uses' => 'backend\PagesController@duplicate']);
+    Route::get('dashboard/pages-delete/{slug}', ['uses' => 'backend\PagesController@deletePage']);
+    Route::get('dashboard/pages-delete-row/{id}', ['uses' => 'backend\PagesController@deletePageRow']);
+
+    Route::get('dashboard/services-duplicate/{slug}', ['uses' => 'backend\ServicesController@duplicate']);
+    Route::get('dashboard/services-delete/{slug}', ['uses' => 'backend\ServicesController@delete']);
 
     Route::get('dashboard/pages/{slug}', ['uses' => 'backend\PagesController@page']);
 
