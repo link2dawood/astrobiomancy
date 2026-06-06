@@ -48,19 +48,36 @@
          </a>
             <ul id="pages" class="collapse">
                 <li> <a href="{{url('dashboard/pages')}}" ><span><strong>All pages / New</strong></span></a></li>
+
+                {{-- Singletons (fixed controller routes — don't depend on slug values) --}}
                 <li> <a href="{{url('dashboard/pages/home')}}" ><span>Home</span></a></li>
-                <li> <a href="{{url('dashboard/pages/about')}}" ><span>About Us </span></a></li>
-                <li> <a href="{{url('dashboard/pages/about-the-book')}}" ><span>About The Book</span></a></li>
+                <li> <a href="{{url('dashboard/pages/about')}}" ><span>About Us</span></a></li>
                 <li> <a href="{{url('dashboard/pages/disclaimer')}}" ><span>Disclaimer</span></a></li>
                 <li> <a href="{{url('dashboard/pages/privacypolicy')}}" ><span>Privacy Policy</span></a></li>
-                <li> <a href="{{url('dashboard/services/dietary-health-advice')}}" ><span> Dietary / Health advice</span></a></li>
-                <li> <a href="{{url('dashboard/services/energy-work-blockage-removal')}}" ><span>Energy work / Removal</span></a></li>
-                <li> <a href="{{url('dashboard/services/biomantic-astrobiomantic-readings')}}" ><span>Biomantic / Astrobiomantic readings</span></a></li>
-                <li> <a href="{{url('dashboard/services/geomantic-astrogeomantic-readings')}}" ><span>Geomantic / Astrogeomantic readings</span></a></li>
 
-                <li> <a href="{{url('dashboard/pages/terms-conditions')}}" ><span>Terms & Conditions</span></a></li>
-                <li> <a href="{{url('dashboard/pages/cookie-policy')}}" ><span>Cookie Policy</span></a></li>
+                {{-- Services — pulled from the DB so renaming a slug doesn't break the link. --}}
+                @php
+                    $svcSlugs = \App\Models\Services::orderBy('id')->pluck('main_heading', 'slug')->unique();
+                @endphp
+                @foreach ($svcSlugs as $sSlug => $sLabel)
+                    <li> <a href="{{ url('dashboard/services/' . $sSlug) }}" ><span>{{ $sLabel ?: $sSlug }}</span></a></li>
+                @endforeach
 
+                {{-- Custom Pages (Pages collection) — pulled from the DB. EN row preferred when available. --}}
+                @php
+                    $pageSlugs = \App\Models\Pages::orderBy('id')->get()
+                        ->groupBy('slug')
+                        ->map(function ($rows) {
+                            $en = $rows->firstWhere('lang', 'en');
+                            return ($en ?: $rows->first())->main_heading;
+                        });
+                @endphp
+                @foreach ($pageSlugs as $pSlug => $pLabel)
+                    {{-- Skip hero override rows from the dropdown (they appear in the main /dashboard/pages list) --}}
+                    @if (!in_array($pSlug, ['testimonials-hero', 'account-hero']))
+                        <li> <a href="{{ url('dashboard/pages/' . $pSlug) }}" ><span>{{ $pLabel ?: $pSlug }}</span></a></li>
+                    @endif
+                @endforeach
             </ul>
         </li>
         <li icon="md md-blur-on"> <a href="{{url('dashboard/testimonials')}}"><i class="md md-format-quote"></i>&nbsp;<span>Testimonials</span></a></li>
