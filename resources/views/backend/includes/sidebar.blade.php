@@ -72,11 +72,18 @@
                             return ($en ?: $rows->first())->main_heading;
                         });
                 @endphp
+                @php
+                    // Friendly admin labels for the special hero-override pages
+                    // so the sidebar shows "Testimonials" / "Account" instead
+                    // of the raw slug.
+                    $sidebarLabels = [
+                        'testimonials-hero' => 'Testimonials',
+                        'account-hero'      => 'Account',
+                    ];
+                @endphp
                 @foreach ($pageSlugs as $pSlug => $pLabel)
-                    {{-- Skip hero override rows from the dropdown (they appear in the main /dashboard/pages list) --}}
-                    @if (!in_array($pSlug, ['testimonials-hero', 'account-hero']))
-                        <li> <a href="{{ url('dashboard/pages/' . $pSlug) }}" ><span>{{ $pLabel ?: $pSlug }}</span></a></li>
-                    @endif
+                    @php $label = $sidebarLabels[$pSlug] ?? ($pLabel ?: $pSlug); @endphp
+                    <li> <a href="{{ url('dashboard/pages/' . $pSlug) }}" ><span>{{ $label }}</span></a></li>
                 @endforeach
             </ul>
         </li>
