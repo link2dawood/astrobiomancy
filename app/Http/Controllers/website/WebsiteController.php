@@ -467,6 +467,23 @@ class WebsiteController extends Controller
 			});
 		}
 
+		// Customer-facing confirmation: contains the per-package message the
+		// admin configured (same content shown on the order page) + a summary
+		// of what they bought + billing address. Mail failures are logged
+		// and swallowed so they can't break the order completion flow.
+		$buyerEmail = $orders->email ?: optional(Auth::user())->email;
+		if ($buyerEmail) {
+			try {
+				$data = ['order' => $orders, 'user' => Auth::user()];
+				\Mail::send('mail.ordercustomer', $data, function ($message) use ($buyerEmail) {
+					$message->to($buyerEmail)
+						->subject('Your Astrobiomancy order confirmation');
+				});
+			} catch (\Throwable $e) {
+				\Log::error('Customer order email failed for ' . $buyerEmail . ': ' . $e->getMessage());
+			}
+		}
+
 		return redirect('users/orders/'.$orders->id)->with('success', 'Your order has been placed now you can ask the question.');
 
 
