@@ -272,11 +272,29 @@ class WebsiteController extends Controller
 			}
 			$groupedData[$name][] = $item;
 		}
-		$order =[];
+		$order = [];
 		if (isset(\Auth::user()->id)) {
 			$order = Orders::where('user_id', \Auth::user()->id)->orderBy('id', 'DESC')->first();
+			// No prior order yet — fall back to the user's saved address so
+			// the order modal pre-fills from /users/address instead of being
+			// blank. Wrap in a stdClass so the view's $order->field accessors
+			// keep working without changes.
+			if (!$order) {
+				$u = \Auth::user();
+				$order = (object) [
+					'first_name' => $u->first_name,
+					'last_name'  => $u->last_name,
+					'email'      => $u->email,
+					'address'    => $u->address,
+					'address2'   => $u->address2,
+					'city'       => $u->city,
+					'zipcode'    => $u->zipcode,
+					'state'      => $u->state,
+					'country'    => $u->country,
+				];
+			}
 		}
-		
+
 		return view('website.pages.service', compact('service', 'groupedData', 'order'));
 	}
 
@@ -423,6 +441,22 @@ class WebsiteController extends Controller
 		$orders->paypal_id = $request->paypal_id;
 		$orders->service_id = $request->service_id;
 		$orders->save();
+
+		// Sync the typed address back into the user's account so the next
+		// order pre-fills automatically and /users/address reflects what
+		// the customer just entered. Only updates fields that the form
+		// actually submitted — empty inputs are skipped to avoid wiping
+		// existing data.
+		$u = User::find(Auth::user()->id);
+		if ($u) {
+			foreach (['first_name','last_name','address','address2','city','zipcode','state','country'] as $f) {
+				if ($request->filled($f)) {
+					$u->{$f} = $request->input($f);
+				}
+			}
+			$u->save();
+		}
+
 		if (isset($settings->admin_email) && $settings->admin_email!='') {
 			$toemail = $settings->admin_email;
 			$data = ['order'=>$orders,'user'=>Auth::user()];
