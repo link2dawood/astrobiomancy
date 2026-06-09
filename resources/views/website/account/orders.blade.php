@@ -29,7 +29,14 @@
                             <td>{{$order->package_name}}</td>
                             <td>{{$order->number_of_question}}</td>
                             <td>{{number_format($order->package_amount, 2)}}EUR</td>
-                            <td><a href="{{url('/users/orders/'.$order->id)}}">Ask Questions</a></td>
+                            <td>
+                                @php $allowance = $order->package_number_of_question ?? $order->number_of_question; @endphp
+                                @if ($allowance > 0)
+                                    <a href="{{ url(app()->getLocale() . '/users/orders/' . $order->id) }}">{{ __('site.btn_ask_questions') }}</a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                     </table>

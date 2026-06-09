@@ -90,6 +90,19 @@
             @endif
             @endforeach
 
+            @php $allowance = $orders->package_number_of_question ?? $orders->number_of_question; @endphp
+            @if ($allowance <= 0)
+                {{-- This package never included questions at all. Show a clear notice. --}}
+                <div class="alert alert-warning">
+                    {{ __('site.flash_no_questions_in_package') }}
+                </div>
+            @elseif ($orders->number_of_question <= 0)
+                {{-- Allowance existed but the customer has used them all. --}}
+                <div class="alert alert-info">
+                    {{ __('site.flash_questions_exhausted') }}
+                </div>
+            @endif
+
             @if ($orders->number_of_question>0)
             <div class="card mb-4" >
                 <div class="card-header" style="color: #4a515b;">Post Question</div>

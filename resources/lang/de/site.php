@@ -106,6 +106,11 @@ return [
     'hint_address2'     => 'Wohnung, Stockwerk, Gebäude usw. (optional)',
     'flash_address_saved' => 'Adresse gespeichert.',
 
+    // Bestellungen
+    'btn_ask_questions'              => 'Fragen stellen',
+    'flash_no_questions_in_package'  => 'Die Option Fragen zu stellen ist in diesem Paket leider nicht enthalten.',
+    'flash_questions_exhausted'      => 'Sie haben alle in diesem Paket enthaltenen Fragen verbraucht.',
+
     // Flash-Meldungen
     'flash_verified'         => 'Ihre E-Mail-Adresse wurde bestätigt. Sie können sich jetzt anmelden.',
     'flash_verify_required'  => 'Ein Bestätigungslink wurde an Ihre E-Mail gesendet. Bitte bestätigen Sie zuerst Ihr Konto.',

@@ -106,6 +106,11 @@ return [
     'hint_address2'     => 'Apartment, suite, building, floor, etc. (optional)',
     'flash_address_saved' => 'Address saved.',
 
+    // Orders
+    'btn_ask_questions'              => 'Ask Questions',
+    'flash_no_questions_in_package'  => 'Sorry, the option to ask questions is not included in this package.',
+    'flash_questions_exhausted'      => 'You have used all the questions included in this package.',
+
     // Flash messages (controllers)
     'flash_verified'         => 'Your email address has been verified. You can now log in to continue.',
     'flash_verify_required'  => 'Verification link has been sent on your email. Please first verify your account.',
