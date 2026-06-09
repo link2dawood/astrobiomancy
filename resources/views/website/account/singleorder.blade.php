@@ -14,6 +14,28 @@
                     {{session()->get('message')}}
                 </div>
             @endif
+
+            {{-- Always show the per-package instructions/welcome message at the top.
+                 Previously this only appeared inside the "Post Question" card, which
+                 was hidden when number_of_question hit 0 — leaving customers on a
+                 completely empty page. --}}
+            <div class="card mb-4">
+                <div class="card-header" style="color: #4a515b;">
+                    {{ $orders->package_name }}
+                    <span class="text-muted" style="font-size:0.85em; margin-left:8px;">
+                        — {{ $orders->package_details }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    @php echo $orders->customer_ask_question_page; @endphp
+                    <hr>
+                    <p class="m-0 text-muted small">
+                        Questions remaining: <strong>{{ $orders->number_of_question }}</strong>
+                        / {{ $orders->package_number_of_question ?? $orders->number_of_question }}
+                    </p>
+                </div>
+            </div>
+
             @foreach ($order_chat as $ordchat)
             @if($ordchat->type==='user')
             <div class="card mb-4" >
@@ -72,7 +94,6 @@
             <div class="card mb-4" >
                 <div class="card-header" style="color: #4a515b;">Post Question</div>
                 <div class="card-body">
-                    <h4>@php echo $orders->customer_ask_question_page; @endphp</h4>
                     <form action="{{url('users/ordersaveques')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">

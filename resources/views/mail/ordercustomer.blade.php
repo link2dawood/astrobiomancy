@@ -50,9 +50,13 @@
         {{ $order->country }}
     </p>
 
+    @php $orderLink = url(app()->getLocale() . '/users/orders/' . $order->id); @endphp
     <p style="margin-top: 24px;">
-        You can view this order and submit your question(s) anytime by logging in at
-        <a href="{{ url('/') }}">astrobiomancy.com</a>.
+        You can open your order and send me your question directly here:<br>
+        <a href="{{ $orderLink }}" style="color:#5e000b; font-weight:600;">{{ $orderLink }}</a>
+    </p>
+    <p style="font-size:0.9em; color:#666;">
+        If you're not already logged in, you'll be asked to log in first — then you'll land on the page where you can write your message.
     </p>
 
     <p>Warmly,<br>Astrobiomancy</p>
