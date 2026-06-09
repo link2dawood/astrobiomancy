@@ -140,9 +140,9 @@ $user_data=Auth::User();
 
 				
 				<fieldset>
-				      <legend> 
-				      	<div class="row">
-				      	<div class="col-md-6" style="padding:0px">   
+				      <legend>
+				      	<div class="row align-items-center">
+				      	<div class="col-md-6" style="padding:0px">
 
 				      		<h3 style="padding-bottom:0px;border:none;font-size:20px;color:black; padding: 12px; " class="table-title p-20">
 				      			@if (isset($_GET['status']) && $_GET['status']==='completed')
@@ -151,10 +151,21 @@ $user_data=Auth::User();
 				      			Orders
                   </h3>
 				      	</div>
-				      	
+				      	<div class="col-md-6 text-right" style="padding:0px 12px; text-align:right;">
+				      		@php $currentStatus = $_GET['status'] ?? 'inprogress'; @endphp
+				      		<a href="{{ url('dashboard/orders?status=inprogress') }}"
+				      		   class="btn btn-xs {{ $currentStatus === 'inprogress' ? 'btn-primary' : 'btn-default' }}"
+				      		   style="font-size:13px;">In progress</a>
+				      		<a href="{{ url('dashboard/orders?status=completed') }}"
+				      		   class="btn btn-xs {{ $currentStatus === 'completed' ? 'btn-primary' : 'btn-default' }}"
+				      		   style="font-size:13px;">Completed</a>
+				      		<a href="{{ url('dashboard/orders-export?status=' . $currentStatus) }}"
+				      		   class="btn btn-xs btn-success"
+				      		   style="font-size:13px; margin-left:8px;">⤓ Export CSV</a>
+				      	</div>
 								</div>
 				       </legend>
-				 
+
               </fieldset>
                   
 				  

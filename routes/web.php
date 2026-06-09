@@ -113,6 +113,7 @@ Route::group([
 Route::group(['middleware' => ['role:Admin', 'auth']], function () {
     Route::get('dashboard', ['uses' => 'backend\DashboardController@dashboardData']);
     Route::get('dashboard/orders', ['uses' => 'backend\OrdersController@orders']);
+    Route::get('dashboard/orders-export', ['uses' => 'backend\OrdersController@export']);
     Route::get('dashboard/orders/delete/{id}', ['uses' => 'backend\OrdersController@deleteorders']);
     Route::post('dashboard/ordersupdate', ['uses' => 'backend\OrdersController@ordersupdate']);
     Route::get('dashboard/orderschat/delete/{id}', ['uses' => 'backend\OrdersController@orderschatdelete']);

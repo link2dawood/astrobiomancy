@@ -18,7 +18,61 @@ use App\Models\Settings;
 */
 class OrdersController extends Controller
 {  
-	public function orders() 
+	/**
+	 * Export the currently-filtered orders to CSV for accounting.
+	 * Only includes amount + buyer email + billing address fields.
+	 * Opens directly in Excel / Numbers / LibreOffice.
+	 */
+	public function export()
+	{
+		$status = $_GET['status'] ?? 'inprogress';
+		$rows = Orders::where('status', $status)
+			->orderBy('id', 'DESC')
+			->get();
+
+		$filename = 'orders-' . $status . '-' . date('Y-m-d') . '.csv';
+
+		$headers = [
+			'Content-Type'        => 'text/csv; charset=UTF-8',
+			'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+			'Cache-Control'       => 'no-store, no-cache',
+		];
+
+		return response()->stream(function () use ($rows) {
+			$out = fopen('php://output', 'w');
+			// UTF-8 BOM so Excel opens umlauts (ä/ö/ü/ß) correctly.
+			fwrite($out, "\xEF\xBB\xBF");
+
+			fputcsv($out, [
+				'Order ID', 'Date', 'Amount (EUR)', 'Email',
+				'First Name', 'Last Name',
+				'Address 1', 'Address 2',
+				'City', 'Zipcode', 'State', 'Country',
+				'Payment ID',
+			]);
+
+			foreach ($rows as $o) {
+				fputcsv($out, [
+					$o->order_id ?? $o->id,
+					$o->created_at ? $o->created_at->format('Y-m-d H:i') : '',
+					$o->package_amount,
+					$o->email,
+					$o->first_name,
+					$o->last_name,
+					$o->address,
+					$o->address2,
+					$o->city,
+					$o->zipcode,
+					$o->state,
+					$o->country,
+					$o->stripe_id ?: $o->paypal_id,
+				]);
+			}
+			fclose($out);
+		}, 200, $headers);
+	}
+
+	public function orders()
 	{
 		$orders = Orders::orderBy('id', 'DESC');
 		if (isset($_GET['status']) && $_GET['status']!='') {
