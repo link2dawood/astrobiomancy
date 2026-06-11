@@ -250,6 +250,10 @@ class WebsiteController extends Controller
 		if (!$service) {
 			abort(404);
 		}
+		// Service has been deactivated by admin — treat as not found publicly.
+		if (($service->status ?? 'Published') === 'Pending') {
+			abort(404);
+		}
 
 		// Packages (pricing JSON) are shared across languages in practice.
 		// If the localized row has no packages, fall back to the EN row so the

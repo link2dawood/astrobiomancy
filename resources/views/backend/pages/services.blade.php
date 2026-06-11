@@ -21,6 +21,35 @@
                             <fieldset>
                                 <legend>Service: <code>{{ $slug }}</code></legend>
 
+                                {{-- Status toggle — applies to every language row of this service. --}}
+                                @php
+                                    $currentStatus = optional($rows['en'] ?? $rows['de'] ?? null)->status ?: 'Published';
+                                    $isActive      = $currentStatus !== 'Pending';
+                                @endphp
+                                <div class="row" style="margin-bottom: 12px;">
+                                    <div class="col-md-12 d-flex align-items-center" style="gap: 12px;">
+                                        <span class="control-label" style="margin-bottom: 0;">Status:</span>
+                                        @if ($isActive)
+                                            <span style="background:#28a745; color:#fff; padding:2px 10px; border-radius:3px; font-size:12px;">ACTIVE</span>
+                                        @else
+                                            <span style="background:#dc3545; color:#fff; padding:2px 10px; border-radius:3px; font-size:12px;">INACTIVE</span>
+                                        @endif
+
+                                        <form action="{{ url('dashboard/services-status/' . $slug) }}" method="POST" style="margin: 0;">
+                                            {{ csrf_field() }}
+                                            <input type="hidden" name="status" value="{{ $isActive ? 'Pending' : 'Published' }}">
+                                            <button type="submit"
+                                                    class="btn btn-xs {{ $isActive ? 'btn-warning' : 'btn-success' }}"
+                                                    onclick="return confirm('{{ $isActive ? 'Deactivate this service? It will be hidden from the public site (the page returns 404 and it disappears from the Services dropdown) until you reactivate it.' : 'Activate this service? It will become visible on the public site again.' }}');">
+                                                {{ $isActive ? 'Deactivate' : 'Activate' }}
+                                            </button>
+                                        </form>
+                                        <small class="text-muted" style="margin-left:4px;">
+                                            Inactive services keep their content but disappear from the public site.
+                                        </small>
+                                    </div>
+                                </div>
+
                                 {{-- Shared slug editor — applies to all language rows of this service.
                                      Renaming sends every row to the new URL and the admin to the new editor URL. --}}
                                 <div class="row" style="margin-bottom: 18px;">

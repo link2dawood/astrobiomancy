@@ -62,6 +62,21 @@ class ServicesController extends Controller
         return redirect('dashboard/pages')->with('message', 'deleted');
     }
 
+    /**
+     * Toggle a service between Published and Pending. Updates every
+     * language row of the same slug so status is service-wide rather
+     * than per-language.
+     */
+    public function setStatus(Request $request, $slug)
+    {
+        $status = $request->input('status') === 'Pending' ? 'Pending' : 'Published';
+        $updated = Services::where('slug', $slug)->update(['status' => $status]);
+        if (!$updated) {
+            return back()->with('error', 'Service not found.');
+        }
+        return back()->with('message', $status === 'Published' ? 'Service activated.' : 'Service deactivated.');
+    }
+
     public function save(Request $request)
     {
         $oldSlug = $request->input('slug');

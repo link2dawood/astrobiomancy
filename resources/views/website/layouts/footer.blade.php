@@ -71,10 +71,21 @@
                                 <li class="mb-2">{!! $renderItem($i) !!}</li>
                             @endforeach
                         @else
-                            <li class="mb-2"><a href="{{ url($L . '/service/dietary-health-advice') }}">{{ __('site.svc_dietary') }}</a></li>
-                            <li class="mb-2"><a href="{{ url($L . '/service/energy-work-blockage-removal') }}">{{ __('site.svc_energy') }}</a></li>
-                            <li class="mb-2"><a href="{{ url($L . '/service/biomantic-astrobiomantic-readings') }}">{{ __('site.svc_biomantic') }}</a></li>
-                            <li class="mb-2"><a href="{{ url($L . '/service/geomantic-astrogeomantic-readings') }}">{{ __('site.svc_geomantic') }}</a></li>
+                            @php
+                                $footerSvcs = \App\Models\Services::where('lang', $L)
+                                    ->where(function ($q) { $q->where('status', 'Published')->orWhereNull('status'); })
+                                    ->orderBy('id')
+                                    ->get(['slug', 'main_heading']);
+                                if ($footerSvcs->isEmpty()) {
+                                    $footerSvcs = \App\Models\Services::where('lang', 'en')
+                                        ->where(function ($q) { $q->where('status', 'Published')->orWhereNull('status'); })
+                                        ->orderBy('id')
+                                        ->get(['slug', 'main_heading']);
+                                }
+                            @endphp
+                            @foreach ($footerSvcs as $svc)
+                                <li class="mb-2"><a href="{{ url($L . '/service/' . $svc->slug) }}">{{ $svc->main_heading }}</a></li>
+                            @endforeach
                         @endif
                     </ul>
                 </div>

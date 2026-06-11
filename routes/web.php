@@ -156,6 +156,7 @@ Route::group(['middleware' => ['role:Admin', 'auth']], function () {
 
     Route::get('dashboard/services-duplicate/{slug}', ['uses' => 'backend\ServicesController@duplicate']);
     Route::get('dashboard/services-delete/{slug}', ['uses' => 'backend\ServicesController@delete']);
+    Route::post('dashboard/services-status/{slug}', ['uses' => 'backend\ServicesController@setStatus']);
 
     Route::get('dashboard/pages/{slug}', ['uses' => 'backend\PagesController@page']);
 

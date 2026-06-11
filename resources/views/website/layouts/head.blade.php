@@ -165,21 +165,35 @@
                             {{-- Hardcoded defaults (used until an editor populates menu_items) --}}
                             <li class="nav-item"><a class="nav-link" href="{{ url('/' . $L) }}">{{ __('site.nav_home') }}</a></li>
 
-                            <li class="nav-item dropdown no-caret">
-                                <a class="nav-link dropdown-toggle" id="navbarDropdownDocs" href="#" role="button" data-bs-toggle="dropdown">
-                                    {{ __('site.nav_services') }}
-                                    <i class="fas fa-chevron-right dropdown-arrow"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end animated--fade-in-up" aria-labelledby="navbarDropdownDocs">
-                                    <a class="dropdown-item py-3" href="{{ url($L . '/service/dietary-health-advice') }}">{{ __('site.svc_dietary') }}</a>
-                                    <div class="dropdown-divider m-0"></div>
-                                    <a class="dropdown-item py-3" href="{{ url($L . '/service/energy-work-blockage-removal') }}">{{ __('site.svc_energy') }}</a>
-                                    <div class="dropdown-divider m-0"></div>
-                                    <a class="dropdown-item py-3" href="{{ url($L . '/service/biomantic-astrobiomantic-readings') }}">{{ __('site.svc_biomantic') }}</a>
-                                    <div class="dropdown-divider m-0"></div>
-                                    <a class="dropdown-item py-3" href="{{ url($L . '/service/geomantic-astrogeomantic-readings') }}">{{ __('site.svc_geomantic') }}</a>
-                                </div>
-                            </li>
+                            @php
+                                // Pull active services from DB so deactivated ones disappear from the dropdown
+                                // and renamed slugs/headings are reflected automatically.
+                                $publicSvcs = \App\Models\Services::where('lang', $L)
+                                    ->where(function ($q) { $q->where('status', 'Published')->orWhereNull('status'); })
+                                    ->orderBy('id')
+                                    ->get(['slug', 'main_heading']);
+                                // Fall back to EN row when a DE translation doesn't exist for the active service.
+                                if ($publicSvcs->isEmpty()) {
+                                    $publicSvcs = \App\Models\Services::where('lang', 'en')
+                                        ->where(function ($q) { $q->where('status', 'Published')->orWhereNull('status'); })
+                                        ->orderBy('id')
+                                        ->get(['slug', 'main_heading']);
+                                }
+                            @endphp
+                            @if ($publicSvcs->isNotEmpty())
+                                <li class="nav-item dropdown no-caret">
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdownDocs" href="#" role="button" data-bs-toggle="dropdown">
+                                        {{ __('site.nav_services') }}
+                                        <i class="fas fa-chevron-right dropdown-arrow"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end animated--fade-in-up" aria-labelledby="navbarDropdownDocs">
+                                        @foreach ($publicSvcs as $svc)
+                                            <a class="dropdown-item py-3" href="{{ url($L . '/service/' . $svc->slug) }}">{{ $svc->main_heading }}</a>
+                                            @if (!$loop->last)<div class="dropdown-divider m-0"></div>@endif
+                                        @endforeach
+                                    </div>
+                                </li>
+                            @endif
 
                             @if(isset($settings->enable_blog) && $settings->enable_blog === '1')
                                 <li class="nav-item"><a class="nav-link" href="{{ url($L . '/blog') }}">{{ __('site.nav_blog') }}</a></li>
