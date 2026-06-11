@@ -26,11 +26,18 @@ class OrdersController extends Controller
 	public function export()
 	{
 		$status = $_GET['status'] ?? 'inprogress';
-		$rows = Orders::where('status', $status)
-			->orderBy('id', 'DESC')
-			->get();
+		$ids    = $_GET['ids'] ?? null;
 
-		$filename = 'orders-' . $status . '-' . date('Y-m-d') . '.csv';
+		$query = Orders::orderBy('id', 'DESC');
+		if (!empty($ids) && is_array($ids)) {
+			// Explicit selection wins — ignore the status filter.
+			$query->whereIn('id', array_map('intval', $ids));
+			$filename = 'orders-selected-' . date('Y-m-d') . '.csv';
+		} else {
+			$query->where('status', $status);
+			$filename = 'orders-' . $status . '-' . date('Y-m-d') . '.csv';
+		}
+		$rows = $query->get();
 
 		$headers = [
 			'Content-Type'        => 'text/csv; charset=UTF-8',

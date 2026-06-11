@@ -155,13 +155,16 @@ $user_data=Auth::User();
 				      		@php $currentStatus = $_GET['status'] ?? 'inprogress'; @endphp
 				      		<a href="{{ url('dashboard/orders?status=inprogress') }}"
 				      		   class="btn btn-xs {{ $currentStatus === 'inprogress' ? 'btn-primary' : 'btn-default' }}"
-				      		   style="font-size:13px;">In progress</a>
+				      		   style="font-size:13px; color:#000 !important;">In progress</a>
 				      		<a href="{{ url('dashboard/orders?status=completed') }}"
 				      		   class="btn btn-xs {{ $currentStatus === 'completed' ? 'btn-primary' : 'btn-default' }}"
-				      		   style="font-size:13px;">Completed</a>
-				      		<a href="{{ url('dashboard/orders-export?status=' . $currentStatus) }}"
+				      		   style="font-size:13px; color:#000 !important;">Completed</a>
+				      		<button type="submit" form="ordersExportForm"
 				      		   class="btn btn-xs btn-success"
-				      		   style="font-size:13px; margin-left:8px;">⤓ Export CSV</a>
+				      		   style="font-size:13px; margin-left:8px; color:#000 !important;">⤓ Export CSV</button>
+				      		<small class="d-block text-muted" style="font-size:11px; margin-top:4px;">
+				      			Tick rows to export only those — leave all unticked to export everything in the current view.
+				      		</small>
 				      	</div>
 								</div>
 				       </legend>
@@ -178,12 +181,15 @@ $user_data=Auth::User();
              <div class="card no-margin">
 							<!-- Modal HTML -->
 				 		 <div class="table-responsive white">
+                   <form id="ordersExportForm" action="{{ url('dashboard/orders-export') }}" method="GET">
+                       <input type="hidden" name="status" value="{{ $currentStatus }}">
                    <table class="table table-full table-full-small">
                       <colgroup>
                         <col class="auto-cell-size p-r-20">
                       </colgroup>
                       <thead>
                         <tr>
+                            <th style="width:32px;"><input type="checkbox" id="ordersSelectAll" title="Select all on this page"></th>
 							<th>Order Id</th>
                             <th>Payment Id</th>
 							<th>Paid By</th>
@@ -210,6 +216,7 @@ $user_data=Auth::User();
                       <tbody id="myTable">
 											   @foreach ($orders as $order)
                         <tr>
+                            <td><input type="checkbox" name="ids[]" value="{{ $order->id }}" class="orderExportCheckbox"></td>
 							<td>{{$order->order_id}}</td>
                             <td>
                             	@if (isset($order->stripe_id) && $order->stripe_id!='')
@@ -248,8 +255,20 @@ $user_data=Auth::User();
                         </tr>
                         @endforeach
 					  					</tbody>
-					  
+
             					</table>
+            					</form>
+            					<script>
+            					(function () {
+            					    var selectAll = document.getElementById('ordersSelectAll');
+            					    if (!selectAll) return;
+            					    selectAll.addEventListener('change', function () {
+            					        document.querySelectorAll('.orderExportCheckbox').forEach(function (cb) {
+            					            cb.checked = selectAll.checked;
+            					        });
+            					    });
+            					})();
+            					</script>
 				
 				
 
